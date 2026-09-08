@@ -1,0 +1,15 @@
+{
+  "name": "aegis",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "contracts",
+    "oracle-worker",
+    "frontend"
+  ],
+  "scripts": {
+    "compile:contracts": "npm run compile --workspace=contracts",
+    "test:contracts": "npm run test --workspace=contracts",
+    "test:oracle-connection": "npm run test-connection --workspace=oracle-worker"
+  }
+}

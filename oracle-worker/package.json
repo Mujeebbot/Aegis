@@ -1,0 +1,14 @@
+{
+  "name": "aegis-oracle-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test-connection": "node scripts/testProofBuilderConnection.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@gluwa/usc-sdk": "latest",
+    "ethers": "^5.7.0",
+    "dotenv": "^16.0.0"
+  }
+}
