@@ -1,0 +1,17 @@
+node_modules/
+.env
+.env.local
+*.local
+
+# Hardhat
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+
+# Frontend build
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+npm-debug.log*

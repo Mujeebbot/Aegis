@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: Contracts - compile & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run compile:contracts
+      - run: npm run test:contracts
+
+  # frontend and oracle-worker jobs land once each has real code and tests
+  # to run (see README's "Integration lead responsibilities") - a build/test
+  # step over an empty stub is a false signal, not a safety net.
