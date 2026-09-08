@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (ai-monitor + oracle-worker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # The frontend pins wagmi ^0.12 while rainbowkit 0.10 peers on wagmi
+      # 0.10.x. Until that is reconciled, strict peer resolution fails the whole
+      # workspace install - including the backend, which does not depend on
+      # either package.
+      - name: Install
+        run: npm ci --legacy-peer-deps
+
+      # No secrets required: ai-monitor falls back to fixture mode, and the
+      # worker's tests fake the chain and the proof builder.
+      - name: ai-monitor tests
+        run: npm test --workspace=aegis-ai-monitor
+
+      - name: oracle-worker tests
+        run: npm test --workspace=aegis-oracle-worker
+
+      - name: Syntax check every backend source file
+        run: |
+          find ai-monitor/src oracle-worker/src oracle-worker/scripts \
+            -name '*.js' -print0 | xargs -0 -n1 node --check
+
+  proof-pipeline:
+    name: Live CC3 proof pipeline
+    runs-on: ubuntu-latest
+    # Hits Creditcoin's public testnet, so it must not fail a PR when that
+    # infrastructure is down. It reports, it does not gate.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci --legacy-peer-deps
+
+      # Verifies the CC3 RPC, the ChainInfo precompile, the chainKey table in
+      # src/chains.js, the proof builder service, and the Block Prover
+      # precompile. Catches chainKey mapping drift before it reaches a demo.
+      - name: Proof builder connectivity
+        run: npm run test:oracle-connection
+
+  contracts:
+    name: Contracts
+    runs-on: ubuntu-latest
+    # KNOWN FAILING, and not a backend issue. contracts/package.json declares
+    # @nomicfoundation/hardhat-toolbox but none of the 13 peer dependencies it
+    # requires, so `hardhat compile` aborts with HH801 before touching any
+    # Solidity. The fix belongs to the contracts owner:
+    #
+    #   npm install --save-dev --workspace=aegis-contracts \
+    #     "@nomicfoundation/hardhat-chai-matchers@^2.0.0" \
+    #     "@nomicfoundation/hardhat-ethers@^3.0.0" \
+    #     "@nomicfoundation/hardhat-network-helpers@^1.0.0" \
+    #     "@nomicfoundation/hardhat-verify@^2.0.0" \
+    #     "@typechain/ethers-v6@^0.5.0" "@typechain/hardhat@^9.0.0" \
+    #     "@types/chai@^4.2.0" "@types/mocha@>=9.1.0" "chai@^4.2.0" \
+    #     "hardhat-gas-reporter@^1.0.8" "solidity-coverage@^0.8.1" \
+    #     "ts-node@>=8.0.0" "typechain@^8.3.0"
+    #
+    # Reporting rather than gating, so a known-broken neighbour does not block
+    # backend PRs. Remove continue-on-error once the above lands.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci --legacy-peer-deps
+
+      - name: Compile
+        run: npm run compile:contracts
+
+      # No test files exist yet; hardhat exits 0 on an empty suite, so this
+      # starts reporting as soon as the contracts team adds tests.
+      - name: Test
+        run: npm run test:contracts

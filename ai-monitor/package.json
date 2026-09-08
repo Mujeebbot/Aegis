@@ -1,0 +1,20 @@
+{
+  "name": "aegis-ai-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Off-chain position health monitor. Polls cross-chain lending positions, computes health factors, and dispatches liquidation risk alerts to aegis-oracle-worker.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test",
+    "check": "node --check src/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -2,13 +2,22 @@
   "name": "aegis-oracle-worker",
   "version": "0.1.0",
   "private": true,
+  "description": "Consumes risk alerts from aegis-ai-monitor, builds Merkle + continuity proofs via @gluwa/usc-sdk, and submits them to the LiquidationShieldASC contract on Creditcoin CC3.",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test",
     "test-connection": "node scripts/testProofBuilderConnection.js",
-    "start": "node index.js"
+    "submit": "node scripts/submitProof.js"
   },
   "dependencies": {
-    "@gluwa/usc-sdk": "latest",
-    "ethers": "^5.7.0",
-    "dotenv": "^16.0.0"
+    "@gluwa/usc-sdk": "^0.18.0",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.15.0",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
