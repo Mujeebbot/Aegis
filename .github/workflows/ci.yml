@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+<<<<<<< HEAD
   pull_request:
 
 jobs:
@@ -83,10 +84,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+=======
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    name: Contracts - compile & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+>>>>>>> 18567ff760a760361417455d06132a9e211959e0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+<<<<<<< HEAD
 
       - name: Install
         run: npm ci --legacy-peer-deps
@@ -98,3 +115,12 @@ jobs:
       # starts reporting as soon as the contracts team adds tests.
       - name: Test
         run: npm run test:contracts
+=======
+      - run: npm ci
+      - run: npm run compile:contracts
+      - run: npm run test:contracts
+
+  # frontend and oracle-worker jobs land once each has real code and tests
+  # to run (see README's "Integration lead responsibilities") - a build/test
+  # step over an empty stub is a false signal, not a safety net.
+>>>>>>> 18567ff760a760361417455d06132a9e211959e0

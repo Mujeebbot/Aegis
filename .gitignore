@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Dependencies
 node_modules/
 
@@ -11,20 +12,35 @@ ai-monitor/data/
 oracle-worker/data/
 
 # Contract build output
+=======
+node_modules/
+.env
+.env.local
+*.local
+
+# Hardhat
+>>>>>>> 18567ff760a760361417455d06132a9e211959e0
 contracts/artifacts/
 contracts/cache/
 contracts/typechain-types/
 
+<<<<<<< HEAD
 # Frontend build output
+=======
+# Frontend build
+>>>>>>> 18567ff760a760361417455d06132a9e211959e0
 frontend/dist/
 frontend/.vite/
 
 # Logs
 *.log
 npm-debug.log*
+<<<<<<< HEAD
 
 # Editor / OS
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+=======
+>>>>>>> 18567ff760a760361417455d06132a9e211959e0
