@@ -2,6 +2,20 @@
 
 Single source of truth. If you need a new field or function signature, add it here first, then implement — don't invent divergent versions in your own component.
 
+## Deployed addresses (Creditcoin CC3 testnet)
+
+First trivial deploy-and-call smoke test, done 2026-09-08:
+
+- `SETTLEMENT_CONTRACT_ADDRESS`: `0x78ed031b23457B7bc1BF8D9E2C011B4baf0dF246`
+- `ASC_CONTRACT_ADDRESS`: `0xc70fd0dcf93d9b2f4485a9BF5ecc2D0dA9a0315e`
+
+These are the still-stubbed contracts (constructors only, `verifyPosition`/
+`protectPosition` bodies are `TODO`s) — confirms the CC3 RPC + deploy pipeline
+works end to end, not that the logic is real yet. Redeploy and update both
+this file and every `.env` when the Smart Contract Engineer's real logic
+lands. Frontend reads these via the `VITE_`-prefixed copies in `.env.example`
+(Vite only exposes prefixed vars to client code) — keep both pairs in sync.
+
 ## Contract interfaces (Solidity)
 
 See `contracts/contracts/interfaces/` for the canonical `.sol` files. Summary:
