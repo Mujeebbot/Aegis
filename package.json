@@ -5,10 +5,11 @@
   "workspaces": [
     "contracts",
     "ai-monitor",
-    "oracle-worker",
-    "frontend"
+    "oracle-worker"
   ],
   "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
     "compile:contracts": "npm run compile --workspace=contracts",
     "test:contracts": "npm run test --workspace=contracts",
     "start:monitor": "npm start --workspace=aegis-ai-monitor",

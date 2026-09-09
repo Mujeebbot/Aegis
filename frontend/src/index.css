@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Google Fonts ────────────────────────────────────────────────────────────
+   Loaded via index.html link tags.
+   Space Grotesk = display/headlines
+   Inter = body text
+   JetBrains Mono = technical/mono
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Design Tokens ──────────────────────────────────────────────────────────── */
+
+:root {
+  /* Colors */
+  --color-black:       #080808;
+  --color-void:        #0a0a08;
+  --color-surface:     #0d0d0a;
+  --color-raised:      #111110;
+  --color-border:      #242420;
+  --color-subtle:      #3a3a34;
+  --color-dim:         #5a5a50;
+  --color-muted:       #7a7a6c;
+  --color-off:         #a0a090;
+  --color-white:       #f4f4f0;
+  --color-lime:        #a8e063;
+  --color-lime-bright: #c5f57a;
+  --color-lime-dim:    #6aaf2a;
+  --color-cyan:        #5be4c8;
+  --color-amber:       #e8a040;
+  --color-red:         #e05050;
+
+  /* Typography scale */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── Typography ─────────────────────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* ─── Custom Scrollbar ───────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-subtle);
+}
+
+/* ─── Range Input Styling ────────────────────────────────────────────────────── */
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-lime);
+  cursor: pointer;
+  border: 2px solid var(--color-black);
+  box-shadow: 0 0 8px rgba(168, 224, 99, 0.5);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-lime);
+  cursor: pointer;
+  border: 2px solid var(--color-black);
+}
+
+/* ─── Component Utilities ────────────────────────────────────────────────────── */
+
+@layer components {
+  /* Standard content section padding */
+  .section-padding {
+    @apply py-24 md:py-36;
+  }
+
+  /* Aegis panel — the standard dark card */
+  .aegis-panel {
+    @apply rounded-sm;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Glow text utility */
+  .text-glow-lime {
+    filter: drop-shadow(0 0 16px rgba(168, 224, 99, 0.4));
+  }
+
+  /* Inner lime glow for panels */
+  .shadow-inner-lime {
+    box-shadow: 0 0 24px rgba(168, 224, 99, 0.05) inset;
+  }
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Orbital ring rotations */
+  .animate-orbit-slow {
+    animation: orbit 20s linear infinite;
+  }
+  .animate-orbit-fast {
+    animation: orbit 8s linear infinite;
+  }
+  .animate-orbit-reverse {
+    animation: orbit-reverse 30s linear infinite;
+  }
+
+  /* Ambient glow drift */
+  .animate-drift {
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+
+  /* Ping (expand + fade) */
+  .animate-ping-slow {
+    animation: ping-slow 2.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  /* Pulse dim (for scroll indicator) */
+  .animate-pulse-dim {
+    animation: pulse-dim 2s ease-in-out infinite;
+  }
+
+  /* Slow pulse for core elements */
+  .animate-pulse-slow {
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes orbit-reverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes drift {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  50%  { transform: translate(-48%, -52%) scale(1.04); }
+  100% { transform: translate(-52%, -48%) scale(0.97); }
+}
+
+@keyframes ping-slow {
+  0%   { transform: scale(1); opacity: 0.6; }
+  75%, 100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes pulse-dim {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ─── Focus Styles ───────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 1px solid var(--color-lime);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─── Selection ──────────────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(168, 224, 99, 0.2);
+  color: var(--color-white);
+}
