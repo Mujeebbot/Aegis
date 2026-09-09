@@ -4,12 +4,18 @@
   "private": true,
   "workspaces": [
     "contracts",
+    "ai-monitor",
     "oracle-worker",
     "frontend"
   ],
   "scripts": {
     "compile:contracts": "npm run compile --workspace=contracts",
     "test:contracts": "npm run test --workspace=contracts",
-    "test:oracle-connection": "npm run test-connection --workspace=oracle-worker"
+    "start:monitor": "npm start --workspace=aegis-ai-monitor",
+    "start:worker": "npm start --workspace=aegis-oracle-worker",
+    "test:backend": "npm test --workspace=aegis-ai-monitor && npm test --workspace=aegis-oracle-worker",
+    "test:monitor": "npm test --workspace=aegis-ai-monitor",
+    "test:worker": "npm test --workspace=aegis-oracle-worker",
+    "test:oracle-connection": "npm run test-connection --workspace=aegis-oracle-worker"
   }
 }

@@ -1,0 +1,25 @@
+[
+  {
+    "inputs": [
+      { "internalType": "uint64", "name": "chainKey", "type": "uint64" },
+      { "internalType": "uint64", "name": "blockHeight", "type": "uint64" },
+      { "internalType": "bytes", "name": "encodedTx", "type": "bytes" },
+      { "internalType": "bytes", "name": "merkleProof", "type": "bytes" },
+      { "internalType": "bytes", "name": "continuityProof", "type": "bytes" },
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
+    "name": "verifyPosition",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "settlement",
+    "outputs": [
+      { "internalType": "contract ILiquidationShieldSettlement", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

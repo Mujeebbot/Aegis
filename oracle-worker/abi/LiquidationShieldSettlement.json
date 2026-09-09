@@ -1,0 +1,31 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "healthFactor", "type": "uint256" },
+      {
+        "indexed": false,
+        "internalType": "enum LiquidationShieldSettlement.ProtectionAction",
+        "name": "action",
+        "type": "uint8"
+      }
+    ],
+    "name": "PositionProtected",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "SAFE_THRESHOLD",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "asc",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

@@ -1,17 +1,31 @@
+# Dependencies
 node_modules/
+
+# Environment - never commit real keys
 .env
 .env.local
+.env.*.local
 *.local
 
-# Hardhat
+# Backend runtime state (ai-monitor persists its watchlist here)
+ai-monitor/data/
+oracle-worker/data/
+
+# Hardhat / contract build output
 contracts/artifacts/
 contracts/cache/
 contracts/typechain-types/
 
-# Frontend build
+# Frontend build output
 frontend/dist/
 frontend/.vite/
 
 # Logs
 *.log
 npm-debug.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
