@@ -85,7 +85,7 @@ export function DashboardCore3D({
     // Orbital Defense Ring 2
     const ring2Geo = new THREE.TorusGeometry(1.55, 0.015, 16, 48)
     const ring2Mat = new THREE.MeshBasicMaterial({
-      color: 0x5be4c8,
+      color: 0x34d399,
       transparent: true,
       opacity: 0.4,
     })

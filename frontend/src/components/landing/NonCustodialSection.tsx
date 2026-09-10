@@ -61,7 +61,7 @@ export function NonCustodialSection() {
     const scene = new THREE.Scene()
     const aspect = container.clientWidth / container.clientHeight
     const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100)
-    camera.position.set(0, 1.2, 5.5)
+    camera.position.set(0, 0.1, 5.2)
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(container.clientWidth, container.clientHeight)
@@ -81,10 +81,11 @@ export function NonCustodialSection() {
     scene.add(coreLight)
 
     const vaultGroup = new THREE.Group()
+    vaultGroup.position.set(0, 0, 0)
     scene.add(vaultGroup)
 
     // 1. Outer Wireframe Cube: "User Wallet Custody Boundary"
-    const outerGeo = new THREE.BoxGeometry(2.4, 2.4, 2.4)
+    const outerGeo = new THREE.BoxGeometry(2.2, 2.2, 2.2)
     const outerMat = new THREE.MeshPhysicalMaterial({
       color: 0x224430,
       metalness: 0.2,
@@ -107,7 +108,7 @@ export function NonCustodialSection() {
     vaultGroup.add(outerLine)
 
     // 2. Inner Bounded Sphere: "Aegis Protected Zone"
-    const innerGeo = new THREE.OctahedronGeometry(0.9, 2)
+    const innerGeo = new THREE.OctahedronGeometry(0.85, 2)
     const innerMat = new THREE.MeshPhysicalMaterial({
       color: 0xa8e063,
       metalness: 0.3,
@@ -129,7 +130,7 @@ export function NonCustodialSection() {
     vaultGroup.add(innerLine)
 
     // 3. Floating Defense Shield Rings
-    const ringGeo = new THREE.RingGeometry(1.4, 1.44, 48)
+    const ringGeo = new THREE.RingGeometry(1.3, 1.34, 48)
     const ringMat = new THREE.MeshBasicMaterial({
       color: 0xa8e063,
       side: THREE.DoubleSide,
@@ -265,7 +266,7 @@ export function NonCustodialSection() {
                       onClick={() => setActiveTab('cannot')}
                       className={`font-mono text-xs font-bold px-4 py-2 rounded-lg transition-all ${
                         activeTab === 'cannot'
-                          ? 'bg-red-500/20 text-red-400 border border-red-500/40 shadow-[0_0_12px_rgba(239,68,68,0.2)]'
+                          ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(168,224,99,0.15)]'
                           : 'bg-[#08150d] text-white/60 hover:text-white border border-white/[0.06]'
                       }`}
                     >
@@ -285,16 +286,16 @@ export function NonCustodialSection() {
                       className={`p-4 rounded-xl border transition-all duration-300 ${
                         activeTab === 'can'
                           ? 'bg-[#07130a] border-aegis-lime/20 hover:border-aegis-lime/50'
-                          : 'bg-[#150a0a] border-red-500/20 hover:border-red-500/50'
+                          : 'bg-[#08150e] border-white/[0.08] hover:border-emerald-500/30'
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         <span
                           className={`font-mono text-sm font-bold mt-0.5 ${
-                            activeTab === 'can' ? 'text-aegis-lime' : 'text-red-400'
+                            activeTab === 'can' ? 'text-aegis-lime' : 'text-emerald-400'
                           }`}
                         >
-                          {activeTab === 'can' ? '✓' : '✕'}
+                          {activeTab === 'can' ? '✓' : '⊘'}
                         </span>
                         <div>
                           <h4 className="font-display font-bold text-white text-sm mb-1">

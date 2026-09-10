@@ -1,191 +1,254 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 // ─── PipelineFlow ─────────────────────────────────────────────────────────────
-// Scroll-driven 5-step pipeline — the core Aegis narrative visual.
-// Each step activates as user scrolls to it.
+// Fluid Cybernetic Flow Pipeline
+// Replaces stacked rectangular cards with an interconnected continuous holographic circuit,
+// orbiting photon streams, and organic stage portals.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PIPELINE_STEPS = [
+interface PipelinePhase {
+  id: string
+  phaseNum: string
+  title: string
+  category: string
+  badge: string
+  description: string
+  latency: string
+  proofType: string
+  specs: { label: string; val: string }[]
+  color: string
+}
+
+const PHASES: PipelinePhase[] = [
   {
-    id: 'position',
-    index: '01',
-    title: 'Cross-Chain Position',
-    description: 'Your collateralized position exists on Ethereum Sepolia — monitored in real time.',
-    tech: 'The Graph · Aave V3 · Compound V3 · Morpho Blue',
+    id: 'ingestion',
+    phaseNum: '01',
+    title: 'Cross-Chain Ingestion',
+    category: 'SOURCE TELEMETRY',
+    badge: 'Ethereum Sepolia',
+    description: 'Aegis continuously ingests position collateral, borrow debt, and price oracle feeds from Aave V3, Compound V3, and Morpho Blue.',
+    latency: 'Sub-second Data Feeds',
+    proofType: 'The Graph Subgraphs + Chainlink',
+    specs: [
+      { label: 'Source Chain', val: 'Sepolia (ChainKey 1)' },
+      { label: 'Monitored Assets', val: 'wETH, WBTC, USDC' },
+      { label: 'Oracle Feeds', val: 'Decentralized Price Oracles' },
+    ],
     color: '#a8e063',
   },
   {
-    id: 'monitor',
-    index: '02',
-    title: 'AI Risk Monitor',
-    description: 'The AI engine queries position health every 30 seconds. When risk is detected, an alert is triggered.',
-    tech: 'Health Factor · Collateral/Debt Ratios · Trend Projection',
-    color: '#a8e063',
+    id: 'inference',
+    phaseNum: '02',
+    title: 'AI Hazard Trajectory',
+    category: 'PREDICTIVE INFERENCE',
+    badge: '30s Polling Loop',
+    description: 'The off-chain AI monitoring engine analyzes market depth, price volatility vectors, and health factor decay trajectories in real time.',
+    latency: '30s Continuous Inference',
+    proofType: 'Health Factor Decay Model',
+    specs: [
+      { label: 'Scan Interval', val: '30 Seconds' },
+      { label: 'Risk Threshold', val: 'HF < 1.05 Trigger' },
+      { label: 'Trigger Type', val: 'Automated Event Dispatch' },
+    ],
+    color: '#c5f57a',
   },
   {
-    id: 'attest',
-    index: '03',
-    title: 'Attestcoin Verification',
-    description: 'A Merkle + continuity proof of the source-chain state is generated and submitted to the Attestcoin smart contract.',
-    tech: '@gluwa/usc-sdk · Oracle Worker · Block Prover',
+    id: 'verification',
+    phaseNum: '03',
+    title: 'Attestcoin ZK Proof',
+    category: 'CREDITCOIN CC3 CONSENSUS',
+    badge: 'Merkle Trie Prover',
+    description: 'The Oracle Worker generates cryptographic Merkle storage and continuity proofs via @gluwa/usc-sdk. Attestcoin ASC validates the proof on-chain.',
+    latency: '~15s Cryptographic Finality',
+    proofType: 'Merkle Patricia + Block Prover',
+    specs: [
+      { label: 'Verifier Contract', val: 'Attestcoin.sol (CC3)' },
+      { label: 'Precompile', val: 'Block Prover (Native)' },
+      { label: 'Trust Model', val: '100% Cryptographic Truth' },
+    ],
     color: '#5be4c8',
   },
   {
-    id: 'settle',
-    index: '04',
-    title: 'Creditcoin Settlement',
-    description: 'The proof is verified on-chain on CC3. The Settlement Contract executes the configured protection action.',
-    tech: 'CC3 Testnet · Settlement Contract · ~15s Verification',
-    color: '#5be4c8',
-  },
-  {
-    id: 'protect',
-    index: '05',
-    title: 'Protection Executed',
-    description: 'Debt repaid or position rebalanced before liquidation. Your capital is protected.',
-    tech: 'Aave Repayment · Compound Repayment · Health Factor Restored',
+    id: 'settlement',
+    phaseNum: '04',
+    title: 'Autonomous Settlement',
+    category: 'NON-CUSTODIAL EXECUTION',
+    badge: 'CC3 Settlement Engine',
+    description: 'Upon proof verification, the Settlement Contract coordinates loan repayment or collateral rebalancing directly on the source chain.',
+    latency: '< 15s Autonomous Execution',
+    proofType: 'SAFE_THRESHOLD 1.05 Invariant',
+    specs: [
+      { label: 'Execution Mode', val: 'Non-Custodial Dispatch' },
+      { label: 'Capital Custody', val: 'Zero Protocol Custody' },
+      { label: 'Saved Fee', val: 'Saves 10% Liquidation Penalty' },
+    ],
     color: '#a8e063',
   },
 ]
 
-interface PipelineFlowProps {
-  className?: string
-}
+export function PipelineFlow() {
+  const [activePhaseIndex, setActivePhaseIndex] = useState<number>(0)
+  const [autoPlay, setAutoPlay] = useState<boolean>(true)
 
-export function PipelineFlow({ className }: PipelineFlowProps) {
-  const [activeSteps, setActiveSteps] = React.useState<Set<number>>(new Set())
-  const stepRefs = React.useRef<(HTMLDivElement | null)[]>([])
+  // Auto-advance through the pipeline phases
+  useEffect(() => {
+    if (!autoPlay) return
+    const interval = setInterval(() => {
+      setActivePhaseIndex(prev => (prev + 1) % PHASES.length)
+    }, 3800)
+    return () => clearInterval(interval)
+  }, [autoPlay])
 
-  React.useEffect(() => {
-    const observers: IntersectionObserver[] = []
-
-    stepRefs.current.forEach((el, i) => {
-      if (!el) return
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveSteps(prev => new Set([...prev, i]))
-          }
-        },
-        { threshold: 0.5, rootMargin: '0px 0px -80px 0px' }
-      )
-      obs.observe(el)
-      observers.push(obs)
-    })
-
-    return () => observers.forEach(o => o.disconnect())
-  }, [])
+  const currentPhase = PHASES[activePhaseIndex]
 
   return (
-    <div className={['relative', className ?? ''].join(' ')}>
-      {/* Vertical luminous conduit line */}
-      <div
-        className="absolute left-[24px] md:left-1/2 top-10 bottom-10 w-0.5 -translate-x-1/2"
-        style={{
-          background: 'linear-gradient(to bottom, transparent, #a8e063 15%, #5be4c8 60%, #a8e063 85%, transparent)',
-          opacity: 0.35,
-          boxShadow: '0 0 15px rgba(168,224,99,0.3)',
-        }}
-      />
+    <div className="relative w-full">
+      {/* ── 4-Stage Continuous Flow Ribbon (No Boxy Cards) ── */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10 relative">
 
-      <div className="space-y-6">
-        {PIPELINE_STEPS.map((step, i) => {
-          const isActive = activeSteps.has(i)
-          const isEven = i % 2 === 0
+        {/* Luminous Connecting Fiber Line Behind Stages */}
+        <div className="hidden md:block absolute top-1/2 left-8 right-8 h-0.5 -translate-y-1/2 bg-gradient-to-r from-[#a8e063]/30 via-[#5be4c8]/50 to-[#a8e063]/30 pointer-events-none z-0">
+          {/* Animated Traveling Photon Packet */}
+          <div
+            className="w-8 h-1.5 rounded-full bg-[#a8e063] shadow-[0_0_15px_#a8e063] transition-all duration-700 -translate-y-[2px]"
+            style={{
+              marginLeft: `${(activePhaseIndex / (PHASES.length - 1)) * 95}%`,
+            }}
+          />
+        </div>
+
+        {PHASES.map((phase, idx) => {
+          const isActive = activePhaseIndex === idx
+          const isPassed = idx <= activePhaseIndex
 
           return (
-            <div
-              key={step.id}
-              ref={el => { stepRefs.current[i] = el }}
-              className={[
-                'relative flex md:items-center gap-6 md:gap-14 py-8 md:py-10',
-                'md:flex-row',
-                !isEven ? 'md:flex-row-reverse' : '',
-                'transition-all duration-700',
-              ].join(' ')}
-              style={{
-                opacity: isActive ? 1 : 0.25,
-                transform: isActive ? 'none' : `translateY(16px)`,
+            <button
+              key={phase.id}
+              onClick={() => {
+                setAutoPlay(false)
+                setActivePhaseIndex(idx)
               }}
+              className={`relative z-10 text-left p-5 rounded-2xl transition-all duration-300 flex flex-col items-start ${
+                isActive
+                  ? 'bg-gradient-to-b from-[#0b1d12] to-[#061009] border border-[#a8e063] shadow-[0_0_30px_rgba(168,224,99,0.25)] translate-y-[-4px]'
+                  : 'bg-[#060e08]/60 border border-white/[0.06] hover:border-white/[0.2] hover:bg-[#07130a]'
+              }`}
             >
-              {/* Step Central Node */}
-              <div className="relative flex-shrink-0 flex items-center justify-center">
-                {/* Outer pulse */}
-                {isActive && (
-                  <div
-                    className="absolute w-16 h-16 rounded-full animate-ping-slow"
-                    style={{ background: `${step.color}20` }}
-                  />
-                )}
-
-                {/* Node circle */}
+              {/* Circular Holographic Phase Portal Icon */}
+              <div className="flex items-center justify-between w-full mb-4">
                 <div
-                  className="relative w-12 h-12 rounded-full flex items-center justify-center z-10 backdrop-blur-md"
+                  className={`w-11 h-11 rounded-full flex items-center justify-center font-mono text-xs font-extrabold transition-all duration-300 ${
+                    isActive
+                      ? 'bg-[#a8e063] text-black shadow-[0_0_15px_#a8e063] scale-110'
+                      : isPassed
+                      ? 'bg-[#0e2416] text-[#a8e063] border border-[#a8e063]/40'
+                      : 'bg-white/[0.04] text-white/40 border border-white/[0.08]'
+                  }`}
+                >
+                  {phase.phaseNum}
+                </div>
+                <span
+                  className="font-mono text-[9px] px-2 py-0.5 rounded-full uppercase tracking-wider"
                   style={{
-                    background: isActive ? `radial-gradient(circle, ${step.color}25 0%, #07100b 90%)` : '#07100b',
-                    border: `1px solid ${isActive ? step.color : 'rgba(168,224,99,0.15)'}`,
-                    boxShadow: isActive ? `0 0 25px ${step.color}40` : 'none',
-                    transition: 'all 0.6s ease',
+                    backgroundColor: `${phase.color}15`,
+                    color: phase.color,
+                    border: `1px solid ${phase.color}35`,
                   }}
                 >
-                  <span
-                    className="font-mono text-xs font-bold"
-                    style={{ color: isActive ? step.color : '#4d6955' }}
-                  >
-                    {step.index}
-                  </span>
-                </div>
+                  {phase.badge}
+                </span>
               </div>
 
-              {/* Content Panel */}
-              <div className={['flex-1 max-w-lg', !isEven ? 'md:text-right' : ''].join(' ')}>
-                <div
-                  className="p-6 rounded-2xl glass-panel-luxury border transition-all duration-500"
-                  style={{
-                    borderColor: isActive ? `${step.color}40` : 'rgba(168,224,99,0.1)',
-                    boxShadow: isActive ? `0 12px 35px -10px rgba(0,0,0,0.8), 0 0 20px ${step.color}15` : 'none',
-                  }}
-                >
-                  <div
-                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[9px] font-mono tracking-widest uppercase mb-3"
-                    style={{
-                      color: isActive ? step.color : '#799280',
-                      borderColor: isActive ? `${step.color}35` : 'rgba(255,255,255,0.06)',
-                      background: isActive ? `${step.color}10` : 'transparent',
-                    }}
-                  >
-                    <span className="w-1 h-1 rounded-full" style={{ background: step.color }} />
-                    PHASE {step.index}
-                  </div>
-
-                  <h3
-                    className="font-display text-xl md:text-2xl font-bold mb-2.5 tracking-tight"
-                    style={{ color: isActive ? '#f5f8f5' : '#b2c6b7', transition: 'color 0.6s ease' }}
-                  >
-                    {step.title}
-                  </h3>
-
-                  <p
-                    className="text-sm leading-relaxed mb-4"
-                    style={{ color: isActive ? '#b2c6b7' : '#799280', transition: 'color 0.6s ease' }}
-                  >
-                    {step.description}
-                  </p>
-
-                  <div
-                    className="pt-3 border-t border-[rgba(168,224,99,0.08)] text-[10px] font-mono tracking-wide"
-                    style={{ color: isActive ? '#a8e063' : '#4d6955', transition: 'color 0.6s ease' }}
-                  >
-                    {step.tech}
-                  </div>
-                </div>
+              {/* Title & Category */}
+              <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest mb-1">
+                {phase.category}
               </div>
+              <h3 className={`font-display text-base font-bold transition-colors ${
+                isActive ? 'text-white' : 'text-white/70'
+              }`}>
+                {phase.title}
+              </h3>
 
-              {/* Spacer for balanced alternating layout */}
-              <div className="hidden md:block flex-1 max-w-lg" />
-            </div>
+              {/* Active Glow Accent Bar */}
+              {isActive && (
+                <div className="w-full h-0.5 bg-[#a8e063] mt-4 rounded-full shadow-[0_0_8px_#a8e063]" />
+              )}
+            </button>
           )
         })}
+      </div>
+
+      {/* ── Interactive Phase Deep-Dive Holographic Reactor ── */}
+      <div className="relative p-6 md:p-10 rounded-3xl bg-gradient-to-b from-[#08150d] via-[#050b07] to-[#030604] border border-[rgba(168,224,99,0.2)] shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden">
+
+        {/* Ambient Glow Aura */}
+        <div
+          className="absolute -right-20 -top-20 w-80 h-80 rounded-full blur-[120px] pointer-events-none opacity-20"
+          style={{ background: currentPhase.color }}
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+
+          {/* Left: Phase Technical Details */}
+          <div className="lg:col-span-7 space-y-5">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs font-bold px-3 py-1 rounded-full bg-[#a8e063]/10 border border-[#a8e063]/30 text-[#a8e063]">
+                PHASE {currentPhase.phaseNum} OF 04
+              </span>
+              <span className="text-white/30 font-mono text-xs">•</span>
+              <span className="font-mono text-xs text-white/60 uppercase tracking-wider">
+                {currentPhase.category}
+              </span>
+            </div>
+
+            <h3 className="font-display text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+              {currentPhase.title}
+            </h3>
+
+            <p className="text-sm md:text-base text-white/70 leading-relaxed max-w-xl">
+              {currentPhase.description}
+            </p>
+
+            {/* Specifications Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+              {currentPhase.specs.map((spec, i) => (
+                <div key={i} className="p-3.5 rounded-xl bg-[#061008] border border-white/[0.06]">
+                  <div className="text-[10px] font-mono text-white/40 uppercase tracking-wider mb-1">
+                    {spec.label}
+                  </div>
+                  <div className="font-mono text-xs font-semibold text-white truncate">
+                    {spec.val}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Real-Time Flow Reactor Gauge */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 rounded-2xl bg-[#040805]/90 border border-white/[0.08] shadow-inner">
+            <div className="relative w-40 h-40 flex items-center justify-center mb-4">
+              {/* Orbiting Ring */}
+              <div
+                className="absolute inset-0 rounded-full border-2 border-dashed border-[#a8e063]/40 animate-spin-slow"
+              />
+              <div
+                className="absolute inset-3 rounded-full border border-[#5be4c8]/30"
+              />
+              {/* Inner Core */}
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#a8e063]/20 to-[#0b1d12] border border-[#a8e063] flex flex-col items-center justify-center shadow-[0_0_25px_rgba(168,224,99,0.3)]">
+                <span className="font-mono text-xs font-extrabold text-[#a8e063]">
+                  {currentPhase.phaseNum}
+                </span>
+                <span className="font-mono text-[8px] text-white/60 tracking-wider">ACTIVE</span>
+              </div>
+            </div>
+
+            <div className="text-center font-mono text-xs space-y-1">
+              <div className="text-white font-bold">{currentPhase.proofType}</div>
+              <div className="text-[#a8e063] text-[11px]">{currentPhase.latency}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

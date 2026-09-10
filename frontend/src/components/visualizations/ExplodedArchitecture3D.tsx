@@ -35,7 +35,7 @@ export const ARCH_LAYERS: ArchLayerInfo[] = [
     index: 4,
     name: 'Oracle Worker',
     layerTag: 'PROOF DISPATCH',
-    color: '#a8e063',
+    color: '#c5f57a',
     specs: 'Merkle & Continuity Proofs · @gluwa/usc-sdk',
   },
   {
@@ -43,7 +43,7 @@ export const ARCH_LAYERS: ArchLayerInfo[] = [
     index: 3,
     name: 'Attestcoin (ASC)',
     layerTag: 'ON-CHAIN CC3 (102031)',
-    color: '#c5f57a',
+    color: '#a8e063',
     specs: 'verifyPosition(...) · Cryptographic Verification',
   },
   {
@@ -51,7 +51,7 @@ export const ARCH_LAYERS: ArchLayerInfo[] = [
     index: 2,
     name: 'Block Prover Precompile',
     layerTag: 'CC3 SUBSTRATE ENGINE',
-    color: '#5be4c8',
+    color: '#34d399',
     specs: 'State Root Attestation · Sepolia (key 1) & ETH (key 3)',
   },
   {
@@ -59,7 +59,7 @@ export const ARCH_LAYERS: ArchLayerInfo[] = [
     index: 1,
     name: 'Settlement Contract',
     layerTag: 'AUTONOMOUS DISPATCH',
-    color: '#5be4c8',
+    color: '#22c55e',
     specs: 'protectPosition(...) · SAFE_THRESHOLD 1.05',
   },
   {
@@ -67,7 +67,7 @@ export const ARCH_LAYERS: ArchLayerInfo[] = [
     index: 0,
     name: 'DeFi Protocols',
     layerTag: 'SOURCE CHAIN (SEPOLIA)',
-    color: '#4e6e58',
+    color: '#2d633e',
     specs: 'Aave V3 · Morpho Blue · Compound V3',
   },
 ]
@@ -101,10 +101,10 @@ export function ExplodedArchitecture3D({
     const scene = new THREE.Scene()
     scene.fog = new THREE.FogExp2(0x050906, 0.04)
 
-    // 2. Camera Setup (Isometric slant)
+    // 2. Camera Setup (Isometric slant, perfectly centered)
     const aspect = container.clientWidth / container.clientHeight
-    const camera = new THREE.PerspectiveCamera(42, aspect, 0.1, 100)
-    camera.position.set(0, 1.2, 7.2)
+    const camera = new THREE.PerspectiveCamera(40, aspect, 0.1, 100)
+    camera.position.set(0, 0.3, 8.2)
 
     // 3. Renderer Setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
@@ -122,7 +122,7 @@ export function ExplodedArchitecture3D({
     keyLight.position.set(5, 8, 5)
     scene.add(keyLight)
 
-    const fillLight = new THREE.DirectionalLight(0x5be4c8, 1.8)
+    const fillLight = new THREE.DirectionalLight(0x22c55e, 1.8)
     fillLight.position.set(-6, -4, 4)
     scene.add(fillLight)
 
@@ -132,6 +132,7 @@ export function ExplodedArchitecture3D({
 
     // 5. Stack Root Group
     const stackGroup = new THREE.Group()
+    stackGroup.position.set(0, 0.15, 0)
     scene.add(stackGroup)
 
     // Central Data Beam (Cylinder passing through all layers)

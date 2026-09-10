@@ -38,9 +38,9 @@ export function AttestcoinSection() {
     greenLight.position.set(0, 0, 1.5)
     scene.add(greenLight)
 
-    const cyanLight = new THREE.PointLight(0x5be4c8, 2.0, 10)
-    cyanLight.position.set(-2, 2, 2)
-    scene.add(cyanLight)
+    const emeraldLight = new THREE.PointLight(0x34d399, 2.0, 10)
+    emeraldLight.position.set(-2, 2, 2)
+    scene.add(emeraldLight)
 
     // Proof Ring Group
     const ringGroup = new THREE.Group()
@@ -62,7 +62,7 @@ export function AttestcoinSection() {
     // Inner Concentric Ring
     const innerTorusGeo = new THREE.TorusGeometry(1.1, 0.03, 16, 48)
     const innerTorusMat = new THREE.MeshBasicMaterial({
-      color: 0x5be4c8,
+      color: 0x34d399,
       transparent: true,
       opacity: 0.5,
     })
