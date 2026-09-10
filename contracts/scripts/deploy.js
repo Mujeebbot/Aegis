@@ -10,7 +10,9 @@ async function main() {
   console.log("Deploying with account:", deployer.address);
 
   const Settlement = await hre.ethers.getContractFactory("LiquidationShieldSettlement");
-  // Placeholder ASC address — redeploy Settlement after ASC exists, or use a two-step deploy.
+  // Placeholder ASC address — Settlement must exist before ASC can be deployed
+  // (ASC's constructor needs Settlement's address), so the real ASC address isn't
+  // known yet. Fixed up below via setAsc() once ASC exists.
   const settlement = await Settlement.deploy(deployer.address);
   await settlement.waitForDeployment();
   console.log("Settlement deployed to:", await settlement.getAddress());
@@ -19,6 +21,10 @@ async function main() {
   const asc = await ASC.deploy(await settlement.getAddress());
   await asc.waitForDeployment();
   console.log("ASC deployed to:", await asc.getAddress());
+
+  const setAscTx = await settlement.setAsc(await asc.getAddress());
+  await setAscTx.wait();
+  console.log("Settlement.asc() fixed up to point at the real ASC contract");
 
   console.log("\nAdd these to your .env:");
   console.log(`SETTLEMENT_CONTRACT_ADDRESS=${await settlement.getAddress()}`);

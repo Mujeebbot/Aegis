@@ -6,15 +6,38 @@ component.
 
 ## Deployed addresses (Creditcoin CC3 testnet)
 
-First trivial deploy-and-call smoke test, done 2026-09-08:
+Redeployed 2026-09-10 with real (non-stub) contract logic:
 
-- `SETTLEMENT_CONTRACT_ADDRESS`: `0x78ed031b23457B7bc1BF8D9E2C011B4baf0dF246`
-- `ASC_CONTRACT_ADDRESS`: `0xc70fd0dcf93d9b2f4485a9BF5ecc2D0dA9a0315e`
+- `SETTLEMENT_CONTRACT_ADDRESS`: `0x982801936870B5f5A8C542991C3B7B4778F69A44`
+- `ASC_CONTRACT_ADDRESS`: `0xdb516C062E85408515eE359A18582703C35DBc52`
 
-These are the still-stubbed contracts (constructors only, `verifyPosition`/
-`protectPosition` bodies are `TODO`s) — confirms the CC3 RPC + deploy pipeline
-works end to end, not that the logic is real yet. Redeploy and update both
-this file and every `.env` when the Smart Contract Engineer's real logic
+**What's real now:** `Settlement.setProtectionMode` stores per-user mode/threshold
+with real access control (only the position owner can set their own mode);
+`Settlement.protectPosition` routes to a real action based on the stored mode
+(`onlyASC`-gated); `ASC.verifyPosition` calls the real Block Prover Precompile
+(`0x0FD2`) with the correct struct-typed signature (see `IBlockProver.sol`,
+sourced from the usc-sdk package's own ABI — the earlier draft's raw
+`staticcall` with a hand-guessed `bytes`-only signature would have reverted on
+every call) and has replay protection.
+
+**What's still blocked:** `ASC.decodePositionData()` always reverts —
+extracting `healthFactor`/`collateral`/`debt` from `encodedTx` depends on an
+unresolved design decision (which source-chain event actually carries live
+position health, vs. today's `positionTx.js` which only proves the position's
+original deposit/borrow tx exists). Needs a decision with the backend engineer
+before it can be implemented. Actual repay/rebalance/close calls into a
+lending protocol are separate, not-yet-started work after that.
+
+**Deploy ordering note:** `Settlement`'s constructor takes a placeholder ASC
+address (it has to be deployed before `ASC` exists, since `ASC`'s constructor
+needs `Settlement`'s address) — `scripts/deploy.js` now calls
+`Settlement.setAsc(realAscAddress)` right after deploying `ASC` to fix this up.
+`setAsc` is deployer-only and can run exactly once (`ascLocked`). A prior
+deploy (`0x78ed...`/`0xc70f...`, now abandoned) shipped without this fixup, so
+`Settlement.asc()` pointed at the deployer's own address forever — every real
+`ASC → Settlement.protectPosition` call would have reverted with "Only ASC".
+
+Redeploy and update both this file and every `.env` when more real logic
 lands. Frontend reads these via the `VITE_`-prefixed copies in `.env.example`
 (Vite only exposes prefixed vars to client code) — keep both pairs in sync.
 
