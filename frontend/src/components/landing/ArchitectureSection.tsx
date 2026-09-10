@@ -1,228 +1,274 @@
 import React from 'react'
 import { SectionLabel } from '../ui/SectionLabel'
 import { ScrollReveal } from '../ui/TechnicalPanel'
+import { ExplodedArchitecture3D, ARCH_LAYERS } from '../visualizations/ExplodedArchitecture3D'
 
 // ─── ArchitectureSection ──────────────────────────────────────────────────────
-// Interactive technical architecture with hover-reveal details
+// Luxury dark-green architecture section featuring interactive 3D Exploded Stack
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ARCH_NODES = [
-  {
+interface LayerDetail {
+  id: string
+  name: string
+  layerTag: string
+  color: string
+  description: string
+  codeSnippet?: string
+  specs: { key: string; value: string }[]
+  technologies: string[]
+}
+
+const LAYER_DETAILS: Record<string, LayerDetail> = {
+  'ai-monitor': {
     id: 'ai-monitor',
-    label: 'AI Risk Monitor',
-    layer: 'OFF-CHAIN',
+    name: 'AI Risk Monitor',
+    layerTag: 'OFF-CHAIN TELEMETRY LAYER',
     color: '#a8e063',
-    description: 'Continuous position monitoring — polls health factor, collateral/debt ratios via The Graph every 30 seconds. Triggers risk alerts to the oracle worker.',
-    tech: ['The Graph subgraphs', 'Price feeds (Chainlink)', 'Health factor tracking', 'Trend projection model'],
-    x: 1, y: 0,
+    description:
+      'Continuous off-chain inference engine running at 30-second cadence. Ingests position health factor, collateral ratios, and debt indices via The Graph and Chainlink price oracles. Evaluates health trajectories and fires cryptographic risk triggers.',
+    codeSnippet: `// 30s Polling Loop & Risk Detection
+const healthFactor = await fetchPositionHealth(userAddress);
+if (healthFactor < SAFE_THRESHOLD) {
+  await dispatchRiskAlert({ userAddress, healthFactor, timestamp });
+}`,
+    specs: [
+      { key: 'Polling Cadence', value: '30 seconds' },
+      { key: 'Data Sources', value: 'The Graph Subgraphs, Chainlink' },
+      { key: 'Trigger Threshold', value: 'HF < 1.05 (Configurable)' },
+      { key: 'Inference Engine', value: 'Real-time state trajectory' },
+    ],
+    technologies: ['The Graph', 'Chainlink Oracles', 'TypeScript', 'USC-SDK'],
   },
-  {
+  'oracle-worker': {
     id: 'oracle-worker',
-    label: 'Oracle Worker',
-    layer: 'OFF-CHAIN',
+    name: 'Oracle Worker',
+    layerTag: 'PROOF DISPATCH LAYER',
     color: '#a8e063',
-    description: 'Receives risk alerts and generates Merkle + continuity proofs of source-chain state using @gluwa/usc-sdk. Manages the proof submission queue.',
-    tech: ['@gluwa/usc-sdk', 'Merkle proof generation', 'Continuity proof', 'Submission queue'],
-    x: 1, y: 1,
+    description:
+      'Receives risk events and queries the source chain block header. Generates cryptographic Merkle storage proofs and continuity proofs using @gluwa/usc-sdk. Queues and signs attestation payloads for Creditcoin CC3 verification.',
+    codeSnippet: `// Cryptographic Proof Packaging via @gluwa/usc-sdk
+const proof = await uscSdk.generateProof({
+  sourceChainId: 11155111, // Sepolia
+  account: userAddress,
+  blockNumber: targetBlock
+});`,
+    specs: [
+      { key: 'SDK Engine', value: '@gluwa/usc-sdk' },
+      { key: 'Proof Primitive', value: 'Merkle Patricia Trie + Continuity' },
+      { key: 'Dispatch Target', value: 'Attestcoin Smart Contract (ASC)' },
+      { key: 'Attestation Queue', value: 'FIFO with nonce lock' },
+    ],
+    technologies: ['@gluwa/usc-sdk', 'Ethers.js', 'Merkle Patricia Prover'],
   },
-  {
-    id: 'asc',
-    label: 'Attestcoin (ASC)',
-    layer: 'ON-CHAIN (CC3)',
-    color: '#5be4c8',
-    description: 'Smart contract on Creditcoin CC3 testnet. Verifies position proofs using the Block Prover precompile. Calls the Settlement contract on successful verification.',
-    tech: ['verifyPosition(...)', 'Block Prover precompile', 'Chain ID: 102031', 'CC3 Testnet'],
-    x: 2, y: 0,
+  'attestcoin-asc': {
+    id: 'attestcoin-asc',
+    name: 'Attestcoin (ASC)',
+    layerTag: 'ON-CHAIN VERIFICATION (CC3: 102031)',
+    color: '#c5f57a',
+    description:
+      'Smart contract deployed on Creditcoin CC3 testnet. Invokes the native Block Prover precompile to cryptographically verify source-chain position proofs without trusting external multi-sig bridges.',
+    codeSnippet: `// Attestcoin ASC Contract Execution on CC3
+function verifyPosition(
+  bytes calldata proofData,
+  uint256 blockNumber
+) external returns (bool verified) {
+  verified = BLOCK_PROVER.verifyBlock(proofData, blockNumber);
+  if (verified) settlementContract.executeProtection(msg.sender);
+}`,
+    specs: [
+      { key: 'Contract', value: 'Attestcoin.sol' },
+      { key: 'Chain ID', value: '102031 (Creditcoin CC3)' },
+      { key: 'Precompile Call', value: 'Block Prover (Native)' },
+      { key: 'Proof Validation', value: 'Zero Trust Proof Match' },
+    ],
+    technologies: ['Solidity 0.8.24', 'CC3 Substrate EVM', 'Block Prover Precompile'],
   },
-  {
+  'block-prover': {
     id: 'block-prover',
-    label: 'Block Prover',
-    layer: 'ON-CHAIN (CC3)',
+    name: 'Block Prover Precompile',
+    layerTag: 'SUBSTRATE STATE ATTESTATION',
     color: '#5be4c8',
-    description: 'CC3 precompile that cryptographically proves source-chain block attestation. Currently attests Ethereum Sepolia (chainKey 1) and Ethereum mainnet (chainKey 3).',
-    tech: ['Source: Sepolia (chainKey 1)', 'Source: ETH (chainKey 3)', 'ChainInfo precompile', 'Merkle verification'],
-    x: 2, y: 1,
+    description:
+      'Native Creditcoin CC3 precompile that cryptographically validates foreign chain headers. Directly attests Ethereum Sepolia (chainKey 1) and Ethereum Mainnet (chainKey 3) within CC3 consensus.',
+    codeSnippet: `// Precompile Foreign Chain Attestation
+// chainKey 1 = Ethereum Sepolia
+// chainKey 3 = Ethereum Mainnet
+IBlockProver(0x...Precompile).verifySourceHeader(chainKey, headerHash);`,
+    specs: [
+      { key: 'Sepolia Key', value: 'chainKey: 1' },
+      { key: 'Mainnet Key', value: 'chainKey: 3' },
+      { key: 'Execution Cost', value: 'Substrate native gas rate' },
+      { key: 'Finality Check', value: 'Deterministic block attestation' },
+    ],
+    technologies: ['Creditcoin Substrate Core', 'ChainInfo Precompile', 'Consensus Hooks'],
   },
-  {
-    id: 'settlement',
-    label: 'Settlement Contract',
-    layer: 'ON-CHAIN (CC3)',
+  'settlement-contract': {
+    id: 'settlement-contract',
+    name: 'Settlement Contract',
+    layerTag: 'AUTONOMOUS DISPATCH LAYER',
     color: '#5be4c8',
-    description: 'Executes protection actions after successful ASC verification. Calls Aave or Compound repayment on the source chain. SAFE_THRESHOLD: 1.05.',
-    tech: ['protectPosition(...)', 'setProtectionMode(...)', 'SAFE_THRESHOLD: 1.05', 'PositionProtected event'],
-    x: 2, y: 2,
+    description:
+      'The on-chain coordinator that authorizes protection actions once ASC verifies the state proof. Dispatches repayment or rebalancing calls back to the source chain within strictly bounded non-custodial permissions.',
+    codeSnippet: `// Settlement Protection Dispatch
+function protectPosition(
+  address user,
+  ProtectionMode mode,
+  uint256 amount
+) external onlyAttestcoin {
+  require(healthFactor < SAFE_THRESHOLD, "Position Safe");
+  emit PositionProtected(user, mode, amount);
+}`,
+    specs: [
+      { key: 'Safety Guard', value: 'SAFE_THRESHOLD = 1.05' },
+      { key: 'Access Boundary', value: 'onlyAttestcoin modifier' },
+      { key: 'Auditability', value: 'Immutable PositionProtected events' },
+      { key: 'Custody Level', value: 'Non-Custodial (Delegated Action Only)' },
+    ],
+    technologies: ['Settlement.sol', 'EIP-712 Meta-Transactions', 'Creditcoin EVM'],
   },
-  {
-    id: 'protocols',
-    label: 'Aave / Compound',
-    layer: 'SOURCE CHAIN',
-    color: '#888878',
-    description: 'The DeFi lending protocols where user positions exist. Protection is executed by repaying debt or rebalancing collateral through approved calls.',
-    tech: ['Aave V3', 'Compound V3', 'Morpho Blue', 'Ethereum Sepolia'],
-    x: 3, y: 1,
+  'source-protocols': {
+    id: 'source-protocols',
+    name: 'DeFi Protocols',
+    layerTag: 'SOURCE LENDING ECOSYSTEM',
+    color: '#4e6e58',
+    description:
+      'The decentralized lending markets on Ethereum Sepolia where user collateral and debt positions reside. Debt is repaid or collateral rebalanced to restore health factors above liquidation thresholds.',
+    codeSnippet: `// Source Protocol Repay Execution
+IPool(AAVE_V3_POOL).repay(
+  borrowedAsset,
+  repayAmount,
+  INTEREST_RATE_MODE,
+  userAddress
+);`,
+    specs: [
+      { key: 'Active Protocols', value: 'Aave V3 · Morpho Blue · Compound V3' },
+      { key: 'Collateral Assets', value: 'WETH, wstETH, WBTC' },
+      { key: 'Borrow Assets', value: 'USDC, USDT, DAI' },
+      { key: 'Source Chain', value: 'Ethereum Sepolia (Chain ID: 11155111)' },
+    ],
+    technologies: ['Aave V3 Pool', 'Morpho Blue Core', 'Compound Comet'],
   },
-]
+}
 
 export function ArchitectureSection() {
-  const [activeNode, setActiveNode] = React.useState<string | null>(null)
-  const active = ARCH_NODES.find(n => n.id === activeNode)
+  const [selectedLayerId, setSelectedLayerId] = React.useState<string>('attestcoin-asc')
+  const activeDetail = LAYER_DETAILS[selectedLayerId] || LAYER_DETAILS['attestcoin-asc']
 
   return (
-    <section id="architecture" className="relative section-padding" aria-label="Architecture">
-      <div className="max-w-7xl mx-auto px-5 md:px-8">
+    <section
+      id="architecture"
+      className="relative section-padding overflow-hidden"
+      aria-label="Architecture"
+    >
+      <div className="max-w-7xl mx-auto px-5 md:px-8 relative z-10">
         <ScrollReveal>
-          <SectionLabel className="mb-6">System Architecture</SectionLabel>
-          <h2 className="font-display text-display-lg font-bold text-aegis-white mb-4">
-            Built on verified
-            <br />
-            <span className="text-aegis-lime">infrastructure.</span>
-          </h2>
-          <p className="text-aegis-off text-base max-w-xl leading-relaxed mb-4">
-            Hover or tap each component to reveal implementation details.
-          </p>
-          <p className="font-mono text-label-xs text-aegis-muted tracking-widest uppercase mb-12">
-            Off-chain → On-chain (CC3) → Source chain
-          </p>
-        </ScrollReveal>
-
-        <ScrollReveal delay={100}>
-          <div className="grid lg:grid-cols-3 gap-4 mb-6">
-            {/* Column labels */}
-            {['Off-Chain Services', 'Creditcoin CC3 (On-Chain)', 'Source Chain'].map((col, i) => (
-              <div key={col} className="text-center">
-                <span
-                  className="font-mono text-label-xs tracking-widest uppercase"
-                  style={{ color: i === 0 ? '#a8e063' : i === 1 ? '#5be4c8' : '#5a5a50' }}
-                >
-                  {col}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div>
+              <SectionLabel className="mb-4">System Architecture</SectionLabel>
+              <h2 className="font-display text-display-lg font-bold text-white tracking-tight">
+                Architected for zero trust.
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-aegis-lime via-[#c5f57a] to-emerald-400">
+                  Exploded 3D infrastructure.
                 </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-4">
-            {/* Off-Chain column */}
-            <div className="space-y-3">
-              {ARCH_NODES.filter(n => n.x === 1).map(node => (
-                <ArchNode
-                  key={node.id}
-                  node={node}
-                  isActive={activeNode === node.id}
-                  onClick={() => setActiveNode(activeNode === node.id ? null : node.id)}
-                />
-              ))}
+              </h2>
             </div>
-
-            {/* On-Chain column */}
-            <div className="space-y-3">
-              {ARCH_NODES.filter(n => n.x === 2).map(node => (
-                <ArchNode
-                  key={node.id}
-                  node={node}
-                  isActive={activeNode === node.id}
-                  onClick={() => setActiveNode(activeNode === node.id ? null : node.id)}
-                />
-              ))}
-            </div>
-
-            {/* Source chain column */}
-            <div className="flex flex-col justify-center">
-              {ARCH_NODES.filter(n => n.x === 3).map(node => (
-                <ArchNode
-                  key={node.id}
-                  node={node}
-                  isActive={activeNode === node.id}
-                  onClick={() => setActiveNode(activeNode === node.id ? null : node.id)}
-                />
-              ))}
-            </div>
+            <p className="text-aegis-muted text-sm max-w-md leading-relaxed">
+              Explore each layer of the Aegis stack in 3D. From off-chain AI monitoring to native Substrate precompile verification on Creditcoin CC3.
+            </p>
           </div>
         </ScrollReveal>
 
-        {/* Detail panel */}
-        {active && (
-          <ScrollReveal>
-            <div
-              className="mt-6 rounded-lg overflow-hidden transition-all duration-300"
-              style={{ background: '#0d0d0a', border: `1px solid ${active.color}30` }}
-            >
-              <div className="px-5 py-4 border-b flex items-center justify-between" style={{ borderColor: `${active.color}20` }}>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full" style={{ background: active.color }} />
-                  <span className="font-display text-base font-bold text-aegis-white">{active.label}</span>
-                  <span className="font-mono text-label-xs tracking-widest uppercase" style={{ color: `${active.color}80` }}>
-                    {active.layer}
+        {/* 3D Exploded Architecture + Inspector Grid */}
+        <ScrollReveal delay={100}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left: 3D Exploded Model Canvas */}
+            <div className="lg:col-span-7">
+              <ExplodedArchitecture3D
+                selectedLayerId={selectedLayerId}
+                onSelectLayer={setSelectedLayerId}
+              />
+              <div className="flex items-center justify-between mt-3 px-2 text-[11px] font-mono text-aegis-muted">
+                <span>Hover or drag in 3D space to isolate layers</span>
+                <span className="text-aegis-lime">USC Attestation Verified</span>
+              </div>
+            </div>
+
+            {/* Right: Layer Technical Inspector */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="glass-panel-luxury p-6 rounded-2xl border border-aegis-border-emerald">
+                {/* Header Tag */}
+                <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] mb-4">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{
+                        backgroundColor: activeDetail.color,
+                        boxShadow: `0 0 10px ${activeDetail.color}`,
+                      }}
+                    />
+                    <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
+                      {activeDetail.name}
+                    </span>
+                  </div>
+                  <span
+                    className="font-mono text-[10px] px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${activeDetail.color}15`,
+                      color: activeDetail.color,
+                      border: `1px solid ${activeDetail.color}30`,
+                    }}
+                  >
+                    {activeDetail.layerTag}
                   </span>
                 </div>
-                <button
-                  onClick={() => setActiveNode(null)}
-                  className="text-aegis-dim hover:text-aegis-white transition-colors font-mono text-xs"
-                  aria-label="Close detail"
-                >
-                  ✕ close
-                </button>
-              </div>
-              <div className="p-5 grid md:grid-cols-2 gap-6">
-                <p className="text-sm text-aegis-off leading-relaxed">{active.description}</p>
-                <div>
-                  <div className="font-mono text-label-xs text-aegis-dim tracking-widest uppercase mb-3">Implementation</div>
-                  <ul className="space-y-2">
-                    {active.tech.map(t => (
-                      <li key={t} className="flex items-center gap-2 font-mono text-xs" style={{ color: active.color }}>
-                        <span className="opacity-40">›</span>
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
+
+                {/* Description */}
+                <p className="text-sm text-aegis-muted leading-relaxed mb-6">
+                  {activeDetail.description}
+                </p>
+
+                {/* Technical Specifications */}
+                <div className="space-y-2 mb-6 p-4 rounded-xl bg-[#061009] border border-white/[0.06]">
+                  <div className="text-[10px] font-mono text-aegis-lime tracking-widest uppercase mb-2 font-semibold">
+                    COMPONENT SPECIFICATIONS
+                  </div>
+                  {activeDetail.specs.map(s => (
+                    <div key={s.key} className="flex justify-between text-xs font-mono">
+                      <span className="text-white/40">{s.key}:</span>
+                      <span className="text-white/90 text-right">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Code Snippet Box */}
+                {activeDetail.codeSnippet && (
+                  <div className="p-4 rounded-xl bg-black/70 border border-white/[0.08] font-mono text-xs overflow-x-auto text-aegis-lime/90 mb-4">
+                    <div className="text-[10px] text-white/30 tracking-widest uppercase mb-1">
+                      IMPLEMENTATION INTERACTION
+                    </div>
+                    <pre className="text-[11px] leading-relaxed">
+                      {activeDetail.codeSnippet}
+                    </pre>
+                  </div>
+                )}
+
+                {/* Tech Stack Chips */}
+                <div className="flex flex-wrap gap-1.5 pt-2">
+                  {activeDetail.technologies.map(tech => (
+                    <span
+                      key={tech}
+                      className="font-mono text-[10px] px-2.5 py-1 rounded-md bg-[#0a180e] border border-white/[0.08] text-white/70"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
-          </ScrollReveal>
-        )}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
-  )
-}
-
-interface ArchNodeProps {
-  node: typeof ARCH_NODES[0]
-  isActive: boolean
-  onClick: () => void
-}
-
-function ArchNode({ node, isActive, onClick }: ArchNodeProps) {
-  const [hovered, setHovered] = React.useState(false)
-  const active = isActive || hovered
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="w-full text-left rounded-sm overflow-hidden transition-all duration-300 focus-visible:outline-1"
-      style={{
-        background: active ? `${node.color}08` : '#111110',
-        border: `1px solid ${active ? `${node.color}40` : '#242420'}`,
-        boxShadow: active ? `0 0 20px ${node.color}0A` : 'none',
-        transform: active ? 'translateY(-1px)' : 'none',
-      }}
-      aria-expanded={isActive}
-      aria-label={`${node.label} — click to see details`}
-    >
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full transition-all duration-300" style={{ background: active ? node.color : '#3a3a34', boxShadow: active ? `0 0 6px ${node.color}` : 'none' }} />
-            <span className="font-mono text-label-xs tracking-widest uppercase" style={{ color: `${node.color}70` }}>
-              {node.layer}
-            </span>
-          </div>
-          <span className="font-mono text-label-xs text-aegis-muted">{isActive ? '▲' : '▼'}</span>
-        </div>
-        <div className="font-display text-sm font-semibold transition-colors duration-300" style={{ color: active ? node.color : '#a0a090' }}>
-          {node.label}
-        </div>
-      </div>
-    </button>
   )
 }

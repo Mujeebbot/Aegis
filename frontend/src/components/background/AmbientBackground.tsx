@@ -52,55 +52,76 @@ export function AmbientBackground({
       ].join(' ')}
       aria-hidden="true"
     >
-      {/* Base layer */}
-      <div className="absolute inset-0 bg-aegis-black" />
+      {/* Base layer — deep near-black green */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(180deg, #050806 0%, #07100b 40%, #09140d 75%, #050806 100%)',
+        }}
+      />
 
-      {/* Primary ambient glow — the signature green light source */}
+      {/* Primary ambient emerald glow — soft volumetric light source */}
       <div
         ref={glowRef}
         className={prefersReducedMotion ? '' : 'animate-drift'}
         style={{
           position: 'absolute',
-          top: '45%',
-          left: '50%',
+          top: '38%',
+          left: '52%',
           transform: 'translate(-50%, -50%)',
           width: glowSize,
           height: glowSize,
           borderRadius: '50%',
           background: `radial-gradient(ellipse at center,
-            rgba(168,224,99,${glowOpacity}) 0%,
-            rgba(168,224,99,${glowOpacity * 0.4}) 30%,
-            rgba(100,160,50,${glowOpacity * 0.15}) 55%,
-            transparent 70%)`,
+            rgba(168,224,99,${glowOpacity * 0.95}) 0%,
+            rgba(16,185,129,${glowOpacity * 0.45}) 25%,
+            rgba(11,28,17,${glowOpacity * 0.2}) 50%,
+            transparent 72%)`,
           transition: 'transform 0.8s cubic-bezier(0.25,0.1,0.25,1)',
           willChange: 'transform',
         }}
       />
 
-      {/* Secondary accent glow — slightly offset, cooler tone */}
+      {/* Secondary atmospheric emerald light pool — top right */}
       <div
         style={{
           position: 'absolute',
-          top: '30%',
-          left: '35%',
-          width: '40vmax',
-          height: '40vmax',
+          top: '15%',
+          right: '10%',
+          width: '55vmax',
+          height: '55vmax',
           borderRadius: '50%',
           background: `radial-gradient(ellipse at center,
-            rgba(91,228,200,0.04) 0%,
+            rgba(168,224,99,0.06) 0%,
+            rgba(91,228,200,0.03) 35%,
+            transparent 65%)`,
+        }}
+      />
+
+      {/* Tertiary soft ambient pool — bottom left */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '10%',
+          left: '5%',
+          width: '50vmax',
+          height: '50vmax',
+          borderRadius: '50%',
+          background: `radial-gradient(ellipse at center,
+            rgba(16,185,129,0.04) 0%,
             transparent 60%)`,
         }}
       />
 
-      {/* Vignette — deepen the edges */}
+      {/* Vignette — luxury edge shadow */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: `radial-gradient(ellipse 100% 100% at 50% 50%,
-            transparent 40%,
-            rgba(8,8,8,0.5) 70%,
-            rgba(8,8,8,0.9) 100%)`,
+          background: `radial-gradient(ellipse 110% 110% at 50% 50%,
+            transparent 45%,
+            rgba(5,8,6,0.6) 80%,
+            #050806 100%)`,
         }}
       />
 

@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Button } from '../ui/Button'
 import { cn } from '../../lib/utils'
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
-// Premium sticky navigation: starts transparent, gains blur + border on scroll
+// Exact match to reference: Glowing shield icon + AEGIS + center links + outline CTA
+// ─────────────────────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { label: 'Product',       href: '#product' },
+  { label: 'Product',       href: '#problem' },
   { label: 'Architecture',  href: '#architecture' },
   { label: 'Protection',    href: '#protection' },
   { label: 'Technology',    href: '#technology' },
@@ -19,16 +19,9 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = React.useState(false)
 
   React.useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40)
+    const handleScroll = () => setScrolled(window.scrollY > 30)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  // Close mobile menu on resize
-  React.useEffect(() => {
-    const handleResize = () => { if (window.innerWidth >= 768) setMobileOpen(false) }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -42,111 +35,98 @@ export function Navigation() {
     <>
       <nav
         className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           scrolled
-            ? 'bg-aegis-black/80 backdrop-blur-md border-b border-aegis-border/60'
-            : 'bg-transparent border-b border-transparent',
+            ? 'bg-[#050906]/90 backdrop-blur-xl border-b border-[rgba(168,224,99,0.1)] shadow-[0_4px_30px_rgba(0,0,0,0.8)] py-3'
+            : 'bg-transparent py-5',
         )}
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="max-w-7xl mx-auto px-5 md:px-8 h-16 flex items-center justify-between gap-8">
+        <div className="max-w-7xl mx-auto px-5 md:px-10 flex items-center justify-between">
 
-          {/* Logo */}
+          {/* Left: Shield Icon + AEGIS Logo */}
           <Link
             to="/"
-            className="font-display text-xl font-bold tracking-tight text-aegis-white hover:text-aegis-lime transition-colors duration-200 shrink-0"
+            className="flex items-center gap-3 group"
             aria-label="Aegis — Home"
           >
-            AEGIS
+            {/* Green Glowing Shield Icon */}
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center relative">
+              <svg viewBox="0 0 24 24" className="w-7 h-7 text-[#a8e063] drop-shadow-[0_0_8px_rgba(168,224,99,0.6)]" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <path d="M12 2L4 5.5v6.5c0 5.5 3.5 10 8 11.5 4.5-1.5 8-6 8-11.5V5.5L12 2z" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Inner Aegis tree/emblem */}
+                <path d="M12 7v10M9 11l3-3 3 3M9 14.5l3-3 3 3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+              </svg>
+            </div>
+            <span className="font-display text-lg font-extrabold tracking-[0.18em] text-white group-hover:text-aegis-lime transition-colors">
+              AEGIS
+            </span>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Center Nav Links */}
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/80">
             {NAV_LINKS.map(link => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={e => handleAnchorClick(e, link.href)}
-                className="px-4 py-2 text-sm text-aegis-dim hover:text-aegis-white transition-colors duration-200 font-medium"
+                className="hover:text-white transition-colors duration-150"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-3">
-            <Button
-              variant="outline"
-              size="sm"
+          {/* Right CTA: Launch Terminal Button */}
+          <div className="hidden md:flex items-center">
+            <button
               onClick={() => navigate('/app')}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#08130b]/80 hover:bg-[#0c1f12] border border-[#a8e063]/40 hover:border-[#a8e063] text-xs font-semibold tracking-wider text-white transition-all duration-200 shadow-[0_0_12px_rgba(168,224,99,0.15)] group"
             >
-              Launch Terminal
-            </Button>
+              <span>Launch Terminal</span>
+              <span className="text-[#a8e063] transition-transform group-hover:translate-x-0.5">→</span>
+            </button>
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* Mobile Menu Trigger */}
           <button
-            className="md:hidden p-2 text-aegis-dim hover:text-aegis-white transition-colors"
+            className="md:hidden p-2 text-white/80 hover:text-white"
             onClick={() => setMobileOpen(o => !o)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
+            aria-label="Toggle menu"
           >
-            <HamburgerIcon open={mobileOpen} />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobileOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+              )}
+            </svg>
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40 bg-aegis-black/95 backdrop-blur-md md:hidden transition-all duration-300',
-          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
-        )}
-        aria-hidden={!mobileOpen}
-      >
-        <div className="flex flex-col items-center justify-center h-full gap-8">
-          {NAV_LINKS.map((link, i) => (
+      {/* Mobile Drawer */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 bg-[#050906]/98 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-6 p-6">
+          {NAV_LINKS.map(link => (
             <a
               key={link.href}
               href={link.href}
               onClick={e => handleAnchorClick(e, link.href)}
-              className="font-display text-3xl font-bold text-aegis-white hover:text-aegis-lime transition-colors duration-200"
-              style={{ transitionDelay: mobileOpen ? `${i * 60}ms` : '0ms' }}
+              className="text-2xl font-bold text-white hover:text-aegis-lime"
             >
               {link.label}
             </a>
           ))}
-          <Button
-            variant="primary"
-            size="lg"
+          <button
             onClick={() => { setMobileOpen(false); navigate('/app') }}
-            className="mt-4"
+            className="mt-4 px-6 py-3 rounded-full bg-aegis-lime text-black font-bold text-sm shadow-[0_0_20px_rgba(168,224,99,0.4)]"
           >
-            Launch Terminal
-          </Button>
+            Launch Terminal →
+          </button>
         </div>
-      </div>
-    </>
-  )
-}
-
-function HamburgerIcon({ open }: { open: boolean }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      {open ? (
-        <>
-          <line x1="6" y1="6" x2="18" y2="18" />
-          <line x1="18" y1="6" x2="6" y2="18" />
-        </>
-      ) : (
-        <>
-          <line x1="4" y1="7" x2="20" y2="7" />
-          <line x1="4" y1="12" x2="20" y2="12" />
-          <line x1="4" y1="17" x2="20" y2="17" />
-        </>
       )}
-    </svg>
+    </>
   )
 }

@@ -4,8 +4,8 @@ import { cn } from '../../lib/utils'
 import { StatusBadge } from '../ui/StatusBadge'
 
 // ─── AppSidebar ───────────────────────────────────────────────────────────────
-// Premium technical sidebar for the dApp.
-// AEGIS logo always links to / (home) — NON-NEGOTIABLE per requirements.
+// Luxury fintech sidebar for the Aegis dApp.
+// Unmissable "← RETURN TO HOME" navigation button ensures user is never trapped.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
@@ -29,7 +29,7 @@ export function AppSidebar({ walletAddress, isConnected, networkName }: AppSideb
     <>
       {/* Desktop Sidebar */}
       <aside
-        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-56 bg-aegis-void border-r border-aegis-border z-40"
+        className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-[#050906] border-r border-aegis-border-emerald z-40 backdrop-blur-xl"
         role="navigation"
         aria-label="Application navigation"
       >
@@ -42,17 +42,21 @@ export function AppSidebar({ walletAddress, isConnected, networkName }: AppSideb
       </aside>
 
       {/* Mobile Top Bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-aegis-void/95 backdrop-blur border-b border-aegis-border flex items-center justify-between px-4">
-        <Link
-          to="/"
-          className="font-display text-lg font-bold text-aegis-white hover:text-aegis-lime transition-colors"
-          aria-label="Aegis — Home"
-        >
-          AEGIS
-        </Link>
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-16 bg-[#050906]/95 backdrop-blur-md border-b border-aegis-border-emerald flex items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/"
+            className="flex items-center gap-1.5 font-mono text-xs text-aegis-lime hover:underline"
+            aria-label="Return to home"
+          >
+            ← Home
+          </Link>
+          <span className="text-white/20">|</span>
+          <span className="font-display text-sm font-bold text-white">AEGIS</span>
+        </div>
         <button
           onClick={() => setMobileOpen(o => !o)}
-          className="p-2 text-aegis-dim hover:text-aegis-white transition-colors"
+          className="p-2 text-white/70 hover:text-white transition-colors"
           aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
         >
           <MobileMenuIcon open={mobileOpen} />
@@ -65,9 +69,9 @@ export function AppSidebar({ walletAddress, isConnected, networkName }: AppSideb
           className="lg:hidden fixed inset-0 z-40"
           onClick={() => setMobileOpen(false)}
         >
-          <div className="absolute inset-0 bg-aegis-black/80 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
           <aside
-            className="absolute top-0 left-0 bottom-0 w-64 bg-aegis-void border-r border-aegis-border flex flex-col"
+            className="absolute top-0 left-0 bottom-0 w-72 bg-[#050906] border-r border-aegis-border-emerald flex flex-col"
             onClick={e => e.stopPropagation()}
           >
             <SidebarContent
@@ -93,23 +97,48 @@ function SidebarContent({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header — AEGIS links home */}
-      <div className="p-5 border-b border-aegis-border">
+      {/* Top Bar: RETURN TO HOME Link (Prominent & Clear) */}
+      <div className="p-4 border-b border-white/[0.06] bg-[#071109]/80">
+        <button
+          onClick={() => {
+            onClose()
+            navigate('/')
+          }}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-[#0b1b11] border border-aegis-border-emerald hover:border-aegis-lime text-aegis-lime text-xs font-mono font-bold transition-all shadow-[0_0_12px_rgba(168,224,99,0.12)] group"
+          aria-label="Return to Landing Page"
+        >
+          <span className="flex items-center gap-2">
+            <span className="transition-transform group-hover:-translate-x-0.5">←</span>
+            <span>RETURN TO HOME</span>
+          </span>
+          <span className="text-[10px] text-aegis-muted font-normal">ESC</span>
+        </button>
+      </div>
+
+      {/* Brand & Monogram Header */}
+      <div className="p-5 border-b border-white/[0.06]">
         <Link
           to="/"
           onClick={onClose}
-          className="block font-display text-lg font-bold text-aegis-white hover:text-aegis-lime transition-colors duration-200"
-          aria-label="Aegis — Return to home"
+          className="flex items-center gap-3 group"
+          aria-label="Aegis — Home"
         >
-          AEGIS
+          <div className="w-8 h-8 rounded-lg bg-aegis-lime/10 border border-aegis-lime/40 flex items-center justify-center font-mono font-bold text-aegis-lime text-xs shadow-[0_0_10px_rgba(168,224,99,0.2)] group-hover:border-aegis-lime transition-colors">
+            AE
+          </div>
+          <div>
+            <div className="font-display text-base font-bold text-white group-hover:text-aegis-lime transition-colors">
+              AEGIS TERMINAL
+            </div>
+            <div className="text-[10px] font-mono tracking-widest text-aegis-muted uppercase">
+              CC3 Defense Engine
+            </div>
+          </div>
         </Link>
-        <p className="mt-0.5 text-label-xs font-mono tracking-widest text-aegis-dim uppercase">
-          DeFi Defense Protocol
-        </p>
       </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+      {/* Navigation Items */}
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
@@ -117,10 +146,10 @@ function SidebarContent({
             end={to === '/app'}
             onClick={onClose}
             className={({ isActive }) => cn(
-              'flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-medium transition-all duration-150 group',
+              'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group',
               isActive
-                ? 'text-aegis-lime bg-aegis-lime/8 border-l-2 border-aegis-lime pl-[10px]'
-                : 'text-aegis-dim hover:text-aegis-white hover:bg-aegis-raised border-l-2 border-transparent',
+                ? 'text-white bg-[#0b1e12] border border-aegis-border-emerald shadow-[0_0_15px_rgba(168,224,99,0.1)] font-semibold'
+                : 'text-aegis-muted hover:text-white hover:bg-white/[0.03] border border-transparent',
             )}
           >
             {({ isActive }) => (
@@ -128,13 +157,13 @@ function SidebarContent({
                 <Icon
                   className={cn(
                     'w-4 h-4 shrink-0 transition-colors',
-                    isActive ? 'text-aegis-lime' : 'text-aegis-subtle group-hover:text-aegis-off',
+                    isActive ? 'text-aegis-lime' : 'text-white/40 group-hover:text-white/80',
                   )}
                 />
-                {label}
+                <span>{label}</span>
                 {isActive && (
                   <span
-                    className="ml-auto w-1 h-1 rounded-full bg-aegis-lime shadow-lime-sm"
+                    className="ml-auto w-1.5 h-1.5 rounded-full bg-aegis-lime shadow-[0_0_8px_#a8e063]"
                     aria-hidden="true"
                   />
                 )}
@@ -144,49 +173,47 @@ function SidebarContent({
         ))}
       </nav>
 
-      {/* Bottom: Wallet + Network + Home */}
-      <div className="p-3 border-t border-aegis-border space-y-2">
-        {/* Wallet status */}
-        <div className="px-3 py-2 rounded-sm bg-aegis-raised">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-label-xs font-mono tracking-widest text-aegis-dim uppercase">Wallet</span>
+      {/* Bottom: Wallet Telemetry & Network Status */}
+      <div className="p-4 border-t border-white/[0.06] space-y-3 bg-[#040805]/90">
+        {/* Wallet connection status */}
+        <div className="p-3 rounded-xl bg-[#08130b] border border-white/[0.06]">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-mono tracking-widest text-aegis-muted uppercase">
+              WALLET STATUS
+            </span>
             <StatusBadge state={isConnected ? 'MONITORING' : 'OFFLINE'} size="sm" />
           </div>
-          <p className="font-mono text-xs text-aegis-off truncate">
+          <p className="font-mono text-xs text-white/90 truncate font-semibold">
             {walletAddress
               ? `${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`
-              : 'Not connected'}
+              : '0x71C8...3F9A (Demo Mode)'}
           </p>
         </div>
 
-        {/* Network */}
-        <div className="px-3 py-2 rounded-sm bg-aegis-raised flex items-center justify-between">
-          <span className="text-label-xs font-mono tracking-widest text-aegis-dim uppercase">Network</span>
-          <span className="font-mono text-xs text-aegis-cyan">{networkName ?? 'CC3 Testnet'}</span>
+        {/* Network status */}
+        <div className="p-2.5 rounded-xl bg-[#08130b] border border-white/[0.06] flex items-center justify-between">
+          <span className="text-[10px] font-mono tracking-widest text-aegis-muted uppercase">
+            NETWORK
+          </span>
+          <span className="font-mono text-xs text-emerald-400 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            {networkName ?? 'CC3 Testnet (102031)'}
+          </span>
         </div>
-
-        {/* Home */}
-        <button
-          onClick={() => { onClose(); navigate('/') }}
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-sm text-xs font-mono text-aegis-dim hover:text-aegis-white hover:bg-aegis-raised transition-colors tracking-wider uppercase"
-        >
-          <HomeIcon className="w-3.5 h-3.5" />
-          Home
-        </button>
       </div>
     </div>
   )
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// ─── SVG Icons ────────────────────────────────────────────────────────────────
 
 function OverviewIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <rect x="1.5" y="1.5" width="5" height="5" rx="0.5" />
-      <rect x="9.5" y="1.5" width="5" height="5" rx="0.5" />
-      <rect x="1.5" y="9.5" width="5" height="5" rx="0.5" />
-      <rect x="9.5" y="9.5" width="5" height="5" rx="0.5" />
+      <rect x="1.5" y="1.5" width="5" height="5" rx="1" />
+      <rect x="9.5" y="1.5" width="5" height="5" rx="1" />
+      <rect x="1.5" y="9.5" width="5" height="5" rx="1" />
+      <rect x="9.5" y="9.5" width="5" height="5" rx="1" />
     </svg>
   )
 }
@@ -222,15 +249,6 @@ function SettingsIcon({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
       <circle cx="8" cy="8" r="2.5" />
       <path d="M8 1.5 L8 3 M8 13 L8 14.5 M1.5 8 L3 8 M13 8 L14.5 8 M3.2 3.2 L4.2 4.2 M11.8 11.8 L12.8 12.8 M12.8 3.2 L11.8 4.2 M4.2 11.8 L3.2 12.8" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function HomeIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M1.5 7 L8 1.5 L14.5 7" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M3 6.5 L3 14.5 L6.5 14.5 L6.5 10 L9.5 10 L9.5 14.5 L13 14.5 L13 6.5" />
     </svg>
   )
 }

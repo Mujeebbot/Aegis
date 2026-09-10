@@ -21,18 +21,18 @@ export function TechnicalPanel({
 }: TechnicalPanelProps) {
   return (
     <div className={cn(
-      'aegis-panel overflow-hidden',
-      glow && 'border-aegis-lime/20 shadow-inner-lime',
+      'rounded-xl glass-panel-luxury glass-panel-hover overflow-hidden transition-all duration-300',
+      glow && 'border-aegis-lime/30 shadow-[0_0_30px_rgba(168,224,99,0.12)]',
       className,
     )}>
       {header && (
-        <div className="px-4 py-3 border-b border-aegis-border flex items-center justify-between gap-2">
+        <div className="px-5 py-3.5 border-b border-[rgba(168,224,99,0.1)] bg-[rgba(13,29,19,0.4)] flex items-center justify-between gap-2">
           {header}
         </div>
       )}
       <div>{children}</div>
       {footer && (
-        <div className="px-4 py-3 border-t border-aegis-border flex items-center justify-between gap-2">
+        <div className="px-5 py-3.5 border-t border-[rgba(168,224,99,0.1)] bg-[rgba(13,29,19,0.3)] flex items-center justify-between gap-2">
           {footer}
         </div>
       )}

@@ -10,6 +10,7 @@ import { LandingPage } from './pages/LandingPage'
 import { AppLayout } from './components/layout/AppLayout'
 import { AppOverviewPage } from './pages/app/AppOverviewPage'
 import { PositionsPage } from './pages/app/PositionsPage'
+import { PositionDetailPage } from './pages/app/PositionDetailPage'
 import { ProtectionPage } from './pages/app/ProtectionPage'
 import { ActivityPage } from './pages/app/ActivityPage'
 import { SettingsPage } from './pages/app/SettingsPage'
@@ -48,8 +49,9 @@ export default function App() {
               {/* ── dApp ── */}
               <Route path="/app" element={<AppLayout />}>
                 <Route index    element={<AppOverviewPage />} />
-                <Route path="positions"  element={<PositionsPage />} />
-                <Route path="protection" element={<ProtectionPage />} />
+                <Route path="positions"      element={<PositionsPage />} />
+                <Route path="positions/:id"  element={<PositionDetailPage />} />
+                <Route path="protection"     element={<ProtectionPage />} />
                 <Route path="activity"   element={<ActivityPage />} />
                 <Route path="settings"   element={<SettingsPage />} />
                 <Route path="*"          element={<Navigate to="/app" replace />} />

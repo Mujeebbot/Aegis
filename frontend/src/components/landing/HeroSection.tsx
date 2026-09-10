@@ -1,160 +1,154 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../ui/Button'
-import { SectionLabel } from '../ui/SectionLabel'
-import { HeroOrbit } from '../visualizations/HeroOrbit'
-import { AmbientBackground, GridOverlay, OrbitalLines } from '../background/AmbientBackground'
+import { HeroMonument3D } from '../visualizations/HeroMonument3D'
 
 // ─── HeroSection ─────────────────────────────────────────────────────────────
-// Cinematic hero — editorial headline + HeroOrbit visualization
+// Exact match to reference hero section:
+// Headline, 3 Bullet points, Dual CTAs, 3D Defense Monument with 6 Callouts, and Bottom Integration Strip
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function HeroSection() {
   const navigate = useNavigate()
-  const [mounted, setMounted] = React.useState(false)
 
-  React.useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 100)
-    return () => clearTimeout(t)
-  }, [])
-
-  const handleAnchorClick = (e: React.MouseEvent, href: string) => {
+  const handleScrollToArch = (e: React.MouseEvent) => {
     e.preventDefault()
-    const el = document.querySelector(href)
+    const el = document.querySelector('#architecture')
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
     <section
-      className="relative min-h-screen flex flex-col"
+      className="relative min-h-screen bg-[#050806] text-white flex flex-col justify-between pt-28 md:pt-36 pb-12 overflow-hidden"
       aria-label="Hero section"
     >
-      {/* Background */}
-      <AmbientBackground intensity="high" fixed={false} />
-      <GridOverlay opacity={0.025} />
-      <OrbitalLines cx={75} cy={45} />
+      {/* Ambient Volumetric Green Atmosphere */}
+      <div
+        className="absolute top-1/4 right-1/4 w-[750px] h-[750px] pointer-events-none rounded-full blur-[160px] opacity-25"
+        style={{
+          background: 'radial-gradient(circle at center, #a8e063 0%, #0d2616 55%, transparent 75%)',
+        }}
+      />
+      <div
+        className="absolute top-10 left-10 w-[500px] h-[500px] pointer-events-none rounded-full blur-[140px] opacity-15"
+        style={{
+          background: 'radial-gradient(circle at center, #22c55e 0%, #081a0e 60%, transparent 80%)',
+        }}
+      />
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-5 md:px-8 w-full pt-24 pb-16 md:pt-32 md:pb-24">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      {/* Main Grid: Left Copy & Bullets + Right 3D Defense Monument */}
+      <div className="max-w-7xl mx-auto px-5 md:px-10 w-full relative z-10 my-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-6 items-center">
 
-            {/* Left — Text */}
-            <div
-              style={{
-                opacity: mounted ? 1 : 0,
-                transform: mounted ? 'translateY(0)' : 'translateY(32px)',
-                transition: 'opacity 0.8s ease, transform 0.8s ease',
-              }}
-            >
-              <SectionLabel className="mb-6" dot>
-                AI-Powered Cross-Chain Protection
-              </SectionLabel>
+          {/* Left Column: Headline, Bullets, Action Buttons (6 Cols) */}
+          <div className="lg:col-span-6 space-y-7">
+            {/* Top Pill Badge */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#08160d] border border-[rgba(168,224,99,0.3)] shadow-[0_0_15px_rgba(168,224,99,0.12)]">
+              <span className="w-2 h-2 rounded-full bg-[#a8e063] shadow-[0_0_8px_#a8e063]" />
+              <span className="font-mono text-[11px] font-bold tracking-wider text-[#a8e063] uppercase">
+                AI-POWERED CROSS-CHAIN PROTECTION
+              </span>
+            </div>
 
-              <h1 className="font-display text-display-2xl font-bold text-aegis-white mb-6 leading-none">
-                Protect your{' '}
-                <span
-                  className="text-aegis-lime"
-                  style={{ filter: 'drop-shadow(0 0 20px rgba(168,224,99,0.4))' }}
-                >
-                  DeFi capital
-                </span>
-                <br />
-                before liquidation does.
-              </h1>
+            {/* Headline matching image line-breaks & electric green highlight */}
+            <h1 className="font-display text-[clamp(2.6rem,5vw,4.4rem)] font-extrabold text-white leading-[1.08] tracking-tight">
+              Protect your <br />
+              <span className="text-[#a8e063] drop-shadow-[0_0_30px_rgba(168,224,99,0.35)]">
+                DeFi capital
+              </span>{' '}
+              before <br />
+              liquidation does.
+            </h1>
 
-              <p
-                className="text-base md:text-lg text-aegis-off leading-relaxed max-w-lg mb-8"
-                style={{
-                  opacity: mounted ? 1 : 0,
-                  transition: 'opacity 0.8s ease 0.2s',
-                }}
-              >
-                Aegis autonomously monitors your cross-chain DeFi positions and executes
-                configured protection measures through Attestcoin when liquidation risk
-                is detected. Powered by Creditcoin settlement.
-              </p>
-
-              <div
-                className="flex flex-wrap gap-3"
-                style={{
-                  opacity: mounted ? 1 : 0,
-                  transition: 'opacity 0.8s ease 0.35s',
-                }}
-              >
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => navigate('/app')}
-                  id="hero-launch-cta"
-                  rightIcon={<ArrowRightIcon />}
-                >
-                  Launch Aegis Terminal
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  onClick={e => handleAnchorClick(e as React.MouseEvent, '#architecture')}
-                  id="hero-arch-cta"
-                >
-                  Explore Architecture
-                </Button>
+            {/* 3 Key Feature Bullets with green dots */}
+            <div className="space-y-3 pt-1 text-sm md:text-[15px] text-white/80 leading-relaxed font-normal">
+              <div className="flex items-start gap-3">
+                <span className="text-[#a8e063] text-lg leading-none mt-0.5">•</span>
+                <p>
+                  AI monitors lending positions across{' '}
+                  <strong className="font-semibold text-white">
+                    Ethereum, Solana, and Creditcoin 24/7.
+                  </strong>
+                </p>
               </div>
 
-              {/* Technical meta row */}
-              <div
-                className="flex flex-wrap items-center gap-4 mt-10 pt-6 border-t border-aegis-border/40"
-                style={{
-                  opacity: mounted ? 1 : 0,
-                  transition: 'opacity 0.8s ease 0.5s',
-                }}
-              >
-                <TechPill label="Creditcoin CC3" />
-                <TechPill label="Ethereum Sepolia" />
-                <TechPill label="Attestcoin Protocol" />
-                <TechPill label="The Graph" />
+              <div className="flex items-start gap-3">
+                <span className="text-[#a8e063] text-lg leading-none mt-0.5">•</span>
+                <p>
+                  <strong className="font-semibold text-white">Attestcoin</strong> verifies
+                  zero-knowledge state proofs in real time.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <span className="text-[#a8e063] text-lg leading-none mt-0.5">•</span>
+                <p>
+                  <strong className="font-semibold text-white">Creditcoin</strong> settles
+                  trustless defense actions in ~15 seconds.
+                </p>
               </div>
             </div>
 
-            {/* Right — Hero Orbit */}
-            <div
-              className="relative"
-              style={{
-                opacity: mounted ? 1 : 0,
-                transform: mounted ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'opacity 1.0s ease 0.2s, transform 1.0s ease 0.2s',
-              }}
-            >
-              <HeroOrbit className="w-full max-w-[560px] mx-auto" />
+            {/* Dual CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-6 pt-3">
+              {/* Primary Electric Lime Button */}
+              <button
+                onClick={() => navigate('/app')}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#a8e063] hover:bg-[#bcf279] text-black font-extrabold text-sm tracking-wide transition-all duration-200 shadow-[0_0_30px_rgba(168,224,99,0.4)] hover:shadow-[0_0_40px_rgba(168,224,99,0.6)] group"
+              >
+                <span>Launch Aegis Terminal</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </button>
+
+              {/* Secondary Link */}
+              <a
+                href="#architecture"
+                onClick={handleScrollToArch}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-[#a8e063] transition-colors group cursor-pointer"
+              >
+                <span>Explore Architecture</span>
+                <span className="text-[#a8e063] transition-transform group-hover:translate-x-1">→</span>
+              </a>
             </div>
+          </div>
+
+          {/* Right Column: 3D Defense Monument with 6 HUD Callouts (6 Cols) */}
+          <div className="lg:col-span-6 relative flex items-center justify-center">
+            <HeroMonument3D />
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="relative z-10 flex justify-center pb-8">
-        <div className="flex flex-col items-center gap-2 animate-pulse-dim">
-          <span className="text-label-xs font-mono tracking-widest text-aegis-muted uppercase">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-aegis-muted to-transparent" />
+      {/* Bottom: Integrated Protocols & Blockchains Strip */}
+      <div className="relative z-10 w-full pt-12 md:pt-16">
+        <div className="max-w-5xl mx-auto px-5 text-center">
+          {/* Section Header */}
+          <div className="font-mono text-[11px] font-bold uppercase tracking-[0.25em] text-[#a8e063]/80 mb-6">
+            INTEGRATED PROTOCOLS & BLOCKCHAINS
+          </div>
+
+          {/* Partner & Chain Names Row */}
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14 font-display text-sm md:text-base font-bold tracking-wider">
+            <span className="text-white/60 hover:text-white transition-colors cursor-default">
+              AAVE
+            </span>
+            <span className="text-white/60 hover:text-white transition-colors cursor-default">
+              COMPOUND
+            </span>
+            <span className="text-white/60 hover:text-white transition-colors cursor-default">
+              MORPHO
+            </span>
+            <span className="text-[#a8e063] drop-shadow-[0_0_10px_rgba(168,224,99,0.3)] cursor-default">
+              ETHEREUM
+            </span>
+            <span className="text-white/60 hover:text-white transition-colors cursor-default">
+              SOLANA
+            </span>
+            <span className="text-[#a8e063] drop-shadow-[0_0_10px_rgba(168,224,99,0.3)] cursor-default">
+              CREDITCOIN
+            </span>
+          </div>
         </div>
       </div>
     </section>
-  )
-}
-
-function TechPill({ label }: { label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-label-xs font-mono tracking-wide text-aegis-subtle uppercase">
-      <span className="w-1 h-1 rounded-full bg-aegis-lime/50" />
-      {label}
-    </span>
-  )
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M2 7h10M8 3l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }

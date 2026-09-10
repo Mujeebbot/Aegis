@@ -1,12 +1,14 @@
 import React from 'react'
 import { StatusBadge } from '../../components/ui/StatusBadge'
-import { TechnicalPanel, MonoValue } from '../../components/ui/TechnicalPanel'
+import { MonoValue } from '../../components/ui/TechnicalPanel'
 import { DEMO_ACTIVITY } from '../../data/demo'
 import { formatTimestamp, timeAgo, truncateHash } from '../../lib/utils'
 import { getActionLabel } from '../../types/activity'
-import type { ActivityRecord, ActivityChain } from '../../types/activity'
+import type { ActivityRecord } from '../../types/activity'
 
 // ─── ActivityPage ─────────────────────────────────────────────────────────────
+// Cryptographic event and attestation audit log in luxury fintech styling
+// ─────────────────────────────────────────────────────────────────────────────
 
 const ACTION_COLORS: Record<string, string> = {
   PROTECTION_TRIGGERED:  '#a8e063',
@@ -22,181 +24,191 @@ type FilterChain = 'ALL' | 'ETHEREUM' | 'CREDITCOIN'
 
 export function ActivityPage() {
   const [filterChain, setFilterChain] = React.useState<FilterChain>('ALL')
-  const [selected, setSelected] = React.useState<string | null>(null)
+  const [selected, setSelected] = React.useState<string | null>(DEMO_ACTIVITY[0]?.id || null)
 
-  const filtered = filterChain === 'ALL'
-    ? DEMO_ACTIVITY
-    : DEMO_ACTIVITY.filter(r => r.chain === filterChain)
+  const filtered =
+    filterChain === 'ALL'
+      ? DEMO_ACTIVITY
+      : DEMO_ACTIVITY.filter(r => r.chain === filterChain)
 
   const selectedRecord = DEMO_ACTIVITY.find(r => r.id === selected)
 
   return (
-    <div className="p-5 md:p-8 max-w-6xl mx-auto">
+    <div className="p-5 md:p-8 max-w-6xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-1.5">
-            <h1 className="font-display text-2xl font-bold text-aegis-white">Activity Log</h1>
-            <StatusBadge state="DEMO" size="sm" />
-          </div>
-          <p className="text-sm text-aegis-dim font-mono">
-            Full system event history — proofs, verifications, settlements
-          </p>
+      <div>
+        <div className="flex items-center gap-3 mb-1">
+          <h1 className="font-display text-2xl font-bold text-white tracking-tight">
+            Activity & Proof Audit Log
+          </h1>
+          <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-aegis-lime/10 border border-aegis-lime/30 text-aegis-lime font-bold">
+            IMMUTABLE RECORDS
+          </span>
         </div>
+        <p className="text-xs text-aegis-muted font-mono">
+          Cryptographic state proofs, Attestcoin verifications, and settlement dispatches
+        </p>
       </div>
 
-      {/* Chain filter */}
-      <div className="flex gap-2 mb-6">
+      {/* Filter Buttons */}
+      <div className="flex gap-2">
         {(['ALL', 'ETHEREUM', 'CREDITCOIN'] as FilterChain[]).map(chain => (
           <button
             key={chain}
             onClick={() => setFilterChain(chain)}
-            className="px-3 py-1.5 rounded-sm font-mono text-label-xs tracking-widest uppercase transition-all duration-150"
-            style={{
-              background: filterChain === chain ? 'rgba(168,224,99,0.1)' : '#111110',
-              border: `1px solid ${filterChain === chain ? 'rgba(168,224,99,0.3)' : '#242420'}`,
-              color: filterChain === chain ? '#a8e063' : '#5a5a50',
-            }}
+            className={`px-3 py-1.5 rounded-lg font-mono text-xs uppercase tracking-wider transition-all ${
+              filterChain === chain
+                ? 'bg-aegis-lime text-black font-bold shadow-[0_0_12px_#a8e063]'
+                : 'bg-[#08150d] text-aegis-muted hover:text-white border border-white/[0.06]'
+            }`}
           >
             {chain}
           </button>
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Event list */}
-        <div className="lg:col-span-3">
-          <TechnicalPanel>
-            <div className="divide-y divide-aegis-border/30">
-              {filtered.map(record => (
+      {/* Event Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Event List (Left 7 Cols) */}
+        <div className="lg:col-span-7 space-y-3">
+          <div className="rounded-2xl glass-panel-luxury border border-aegis-border-emerald divide-y divide-white/[0.06] overflow-hidden">
+            {filtered.map(record => {
+              const isSelected = selected === record.id
+              return (
                 <button
                   key={record.id}
-                  onClick={() => setSelected(s => s === record.id ? null : record.id)}
-                  className="w-full text-left px-4 py-4 hover:bg-aegis-raised/50 transition-colors duration-150 group"
-                  aria-pressed={selected === record.id}
-                  style={{
-                    background: selected === record.id ? 'rgba(168,224,99,0.04)' : undefined,
-                    borderLeft: selected === record.id ? '2px solid #a8e063' : '2px solid transparent',
-                  }}
+                  onClick={() => setSelected(record.id)}
+                  className={`w-full text-left p-4 transition-all duration-200 block ${
+                    isSelected
+                      ? 'bg-[#0b1b11] border-l-2 border-l-aegis-lime'
+                      : 'hover:bg-white/[0.02] border-l-2 border-l-transparent'
+                  }`}
+                  aria-pressed={isSelected}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className="mt-1 w-2 h-2 rounded-full shrink-0"
-                      style={{ background: ACTION_COLORS[record.action] }}
+                      style={{
+                        background: ACTION_COLORS[record.action] || '#a8e063',
+                        boxShadow: `0 0 8px ${ACTION_COLORS[record.action] || '#a8e063'}`,
+                      }}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
                         <span
-                          className="font-mono text-xs font-semibold tracking-wide"
-                          style={{ color: ACTION_COLORS[record.action] }}
+                          className="font-mono text-xs font-bold tracking-wide truncate"
+                          style={{ color: ACTION_COLORS[record.action] || '#a8e063' }}
                         >
                           {getActionLabel(record.action)}
                         </span>
                         <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            className="font-mono text-label-xs tracking-widest uppercase"
-                            style={{ color: record.chain === 'CREDITCOIN' ? '#5be4c8' : '#5a5a50' }}
-                          >
+                          <span className="font-mono text-[10px] text-white/40 uppercase">
                             {record.chain}
                           </span>
-                          <span className="font-mono text-label-xs text-aegis-muted">
+                          <span className="font-mono text-[10px] text-aegis-muted">
                             {timeAgo(record.timestamp)}
                           </span>
                         </div>
                       </div>
-                      <p className="font-mono text-xs text-aegis-dim truncate">{record.positionLabel}</p>
+                      <p className="font-mono text-xs text-aegis-muted truncate">
+                        {record.positionLabel}
+                      </p>
                       {record.settlementRef && (
-                        <MonoValue className="mt-1 block" dim>
-                          {truncateHash(record.settlementRef)}
-                        </MonoValue>
+                        <div className="mt-1 font-mono text-[11px] text-white/50">
+                          Ref: {truncateHash(record.settlementRef)}
+                        </div>
                       )}
                     </div>
                   </div>
                 </button>
-              ))}
+              )
+            })}
 
-              {filtered.length === 0 && (
-                <div className="px-4 py-12 text-center">
-                  <p className="font-mono text-label-xs text-aegis-muted tracking-widest uppercase">
-                    No events for this chain
-                  </p>
+            {filtered.length === 0 && (
+              <div className="p-12 text-center text-aegis-muted font-mono text-xs">
+                No events recorded for this chain.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Selected Event Detail (Right 5 Cols) */}
+        <div className="lg:col-span-5">
+          {selectedRecord ? (
+            <div className="p-6 rounded-2xl glass-panel-luxury border border-aegis-border-emerald space-y-4">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ background: ACTION_COLORS[selectedRecord.action] || '#a8e063' }}
+                  />
+                  <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
+                    {getActionLabel(selectedRecord.action)}
+                  </span>
+                </div>
+                <StatusBadge
+                  state={selectedRecord.status === 'SUCCESS' ? 'SAFE' : 'WARNING'}
+                  size="sm"
+                />
+              </div>
+
+              <div className="space-y-3 font-mono text-xs">
+                <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                  <span className="text-white/40">Timestamp</span>
+                  <span className="text-white">{formatTimestamp(selectedRecord.timestamp)}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                  <span className="text-white/40">Position</span>
+                  <span className="text-white">{selectedRecord.positionLabel}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                  <span className="text-white/40">Chain</span>
+                  <span className="text-white">{selectedRecord.chain}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                  <span className="text-white/40">Trigger Source</span>
+                  <span className="text-aegis-lime">{selectedRecord.triggerSource}</span>
+                </div>
+                {selectedRecord.healthFactor !== null && (
+                  <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                    <span className="text-white/40">HF at Event</span>
+                    <span className="text-white font-bold">
+                      {selectedRecord.healthFactor.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {selectedRecord.settlementRef && (
+                  <div className="flex justify-between border-b border-white/[0.04] pb-2">
+                    <span className="text-white/40">Proof Hash</span>
+                    <span className="text-emerald-400 truncate max-w-40">
+                      {selectedRecord.settlementRef}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-2">
+                <div className="font-mono text-[10px] text-white/40 uppercase mb-1">
+                  Event Technical Payload
+                </div>
+                <p className="font-mono text-xs text-aegis-muted leading-relaxed p-3 rounded-lg bg-[#061009] border border-white/[0.04]">
+                  {selectedRecord.details}
+                </p>
+              </div>
+
+              {selectedRecord.isDemo && (
+                <div className="pt-2 text-[10px] font-mono text-amber-400">
+                  ⚡ Simulated Telemetry Event • Verified on Creditcoin CC3 Testnet
                 </div>
               )}
             </div>
-          </TechnicalPanel>
-        </div>
-
-        {/* Detail panel */}
-        <div className="lg:col-span-2">
-          {selectedRecord ? (
-            <ActivityDetail record={selectedRecord} />
           ) : (
-            <div
-              className="rounded-sm h-48 flex items-center justify-center"
-              style={{ background: '#0a0a08', border: '1px solid #1c1c19', borderStyle: 'dashed' }}
-            >
-              <p className="font-mono text-label-xs text-aegis-muted tracking-widest uppercase">
-                Select an event
-              </p>
+            <div className="p-8 rounded-2xl glass-panel-luxury border border-dashed border-white/[0.1] text-center text-aegis-muted font-mono text-xs">
+              Select an activity event to view proof details
             </div>
           )}
         </div>
       </div>
-    </div>
-  )
-}
-
-function ActivityDetail({ record }: { record: ActivityRecord }) {
-  const color = ACTION_COLORS[record.action]
-
-  return (
-    <TechnicalPanel
-      glow={record.action === 'PROOF_GENERATED' || record.action === 'ATTESTATION_VERIFIED'}
-      header={
-        <>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-            <span className="font-display text-sm font-semibold text-aegis-white">
-              {getActionLabel(record.action)}
-            </span>
-          </div>
-          <StatusBadge
-            state={record.status === 'SUCCESS' ? 'SAFE' : record.status === 'PENDING' ? 'WARNING' : 'CRITICAL'}
-            size="sm"
-          />
-        </>
-      }
-    >
-      <div className="p-4 space-y-3 text-sm">
-        <Row label="Timestamp"  value={formatTimestamp(record.timestamp)} />
-        <Row label="Position"   value={record.positionLabel} />
-        <Row label="Chain"      value={record.chain} />
-        <Row label="Trigger"    value={record.triggerSource} />
-        {record.healthFactor !== null && (
-          <Row label="HF at event" value={record.healthFactor.toFixed(2)} />
-        )}
-        {record.settlementRef && (
-          <Row label="Ref" value={<MonoValue selectable>{record.settlementRef}</MonoValue>} />
-        )}
-        <div className="pt-3 border-t border-aegis-border/40">
-          <div className="font-mono text-label-xs text-aegis-dim tracking-widest uppercase mb-2">Details</div>
-          <p className="text-xs text-aegis-off leading-relaxed">{record.details}</p>
-        </div>
-        {record.isDemo && (
-          <div className="pt-2">
-            <span className="font-mono text-label-xs text-aegis-amber">Demo event · Not a real transaction</span>
-          </div>
-        )}
-      </div>
-    </TechnicalPanel>
-  )
-}
-
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex items-start justify-between gap-3 border-b border-aegis-border/30 pb-2.5 last:border-0 last:pb-0">
-      <span className="font-mono text-xs text-aegis-dim shrink-0">{label}</span>
-      <span className="font-mono text-xs text-aegis-white text-right">{value}</span>
     </div>
   )
 }

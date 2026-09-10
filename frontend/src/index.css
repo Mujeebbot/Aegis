@@ -12,23 +12,30 @@
 /* ─── Design Tokens ──────────────────────────────────────────────────────────── */
 
 :root {
-  /* Colors */
-  --color-black:       #080808;
-  --color-void:        #0a0a08;
-  --color-surface:     #0d0d0a;
-  --color-raised:      #111110;
-  --color-border:      #242420;
-  --color-subtle:      #3a3a34;
-  --color-dim:         #5a5a50;
-  --color-muted:       #7a7a6c;
-  --color-off:         #a0a090;
-  --color-white:       #f4f4f0;
+  /* Luxury Dark Green Hierarchy */
+  --color-black:       #050806;
+  --color-void:        #07100b;
+  --color-surface:     #09140d;
+  --color-raised:      #0d1d13;
+  --color-border:      #162a1d;
+  --color-subtle:      #233e2b;
+  --color-dim:         #4d6955;
+  --color-muted:       #799280;
+  --color-off:         #b2c6b7;
+  --color-white:       #f5f8f5;
+
+  /* Accent & Status */
   --color-lime:        #a8e063;
   --color-lime-bright: #c5f57a;
-  --color-lime-dim:    #6aaf2a;
+  --color-lime-dim:    #589e24;
+  --color-emerald:     #10b981;
   --color-cyan:        #5be4c8;
   --color-amber:       #e8a040;
   --color-red:         #e05050;
+
+  /* Luxury Glass & Glow Tokens */
+  --color-glass:       rgba(9, 20, 13, 0.72);
+  --color-border-glow: rgba(168, 224, 99, 0.16);
 
   /* Typography scale */
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -114,11 +121,35 @@ input[type="range"]::-moz-range-thumb {
     @apply py-24 md:py-36;
   }
 
-  /* Aegis panel — the standard dark card */
+  /* Aegis panel — luxury dark green card with hairline border */
   .aegis-panel {
     @apply rounded-sm;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
+  }
+
+  /* Luxury Glassmorphic Panel inspired by high-end fintech UI */
+  .glass-panel-luxury {
+    background: linear-gradient(135deg, rgba(13, 29, 19, 0.75) 0%, rgba(7, 16, 11, 0.85) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(168, 224, 99, 0.13);
+    box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(168, 224, 99, 0.08) inset;
+  }
+
+  /* Subtle card highlight on hover */
+  .glass-panel-hover {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .glass-panel-hover:hover {
+    border-color: rgba(168, 224, 99, 0.28);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.9), 0 0 25px rgba(168, 224, 99, 0.12);
+    transform: translateY(-2px);
+  }
+
+  /* Radial environmental lighting pool */
+  .glow-radial-green {
+    background: radial-gradient(circle at 50% 35%, rgba(168, 224, 99, 0.08) 0%, rgba(11, 28, 17, 0.04) 50%, transparent 80%);
   }
 
   /* Glow text utility */

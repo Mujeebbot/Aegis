@@ -90,53 +90,57 @@ export function ProblemSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
 
           {/* Left — Problems */}
-          <div className="space-y-8">
+          <div className="space-y-4">
             {PROBLEMS.map((problem, i) => (
               <ScrollReveal key={problem.title} delay={i * 100}>
-                <div className="flex gap-4 group">
+                <div className="p-5 rounded-xl glass-panel-luxury border border-[rgba(168,224,99,0.1)] hover:border-[rgba(168,224,99,0.25)] transition-all duration-300 flex items-start gap-4 group">
                   <div className="flex-shrink-0 mt-0.5">
-                    <div className="w-6 h-6 rounded-sm bg-aegis-surface border border-aegis-border flex items-center justify-center">
-                      <span className="font-mono text-label-xs text-aegis-muted">
+                    <div className="w-8 h-8 rounded-full bg-[rgba(168,224,99,0.08)] border border-[rgba(168,224,99,0.25)] flex items-center justify-center group-hover:border-aegis-lime/60 group-hover:shadow-[0_0_12px_rgba(168,224,99,0.3)] transition-all">
+                      <span className="font-mono text-xs text-aegis-lime font-bold">
                         {String(i + 1).padStart(2, '0')}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-display text-base font-semibold text-aegis-white mb-1.5">
+                    <h3 className="font-display text-base font-semibold text-aegis-white mb-1.5 group-hover:text-aegis-lime transition-colors">
                       {problem.title}
                     </h3>
-                    <p className="text-sm text-aegis-dim leading-relaxed">{problem.body}</p>
+                    <p className="text-sm text-aegis-off leading-relaxed">{problem.body}</p>
                   </div>
                 </div>
               </ScrollReveal>
             ))}
           </div>
 
-          {/* Right — Animated Risk Visualization */}
+          {/* Right — Animated Risk Visualization Instrument */}
           <ScrollReveal delay={200}>
             <div
-              className="relative rounded-lg overflow-hidden"
+              className="relative rounded-2xl overflow-hidden glass-panel-luxury p-1"
               style={{
-                background: '#0d0d0a',
-                border: `1px solid ${phase === 'risk' ? '#e05050' : phase === 'warning' ? '#e8a040' : '#242420'}`,
-                boxShadow: phase === 'risk' ? '0 0 40px rgba(224,80,80,0.12)' : 'none',
+                borderColor: phase === 'risk' ? '#e05050' : phase === 'warning' ? '#e8a040' : 'rgba(168,224,99,0.16)',
+                boxShadow: phase === 'risk' ? '0 0 50px rgba(224,80,80,0.18)' : '0 16px 40px -12px rgba(0,0,0,0.8)',
                 transition: 'border-color 1s ease, box-shadow 1s ease',
               }}
             >
               {/* Panel header */}
-              <div className="px-4 py-3 border-b border-aegis-border flex items-center justify-between">
+              <div className="px-5 py-3.5 border-b border-[rgba(168,224,99,0.1)] bg-[rgba(13,29,19,0.4)] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div
-                    className="w-1.5 h-1.5 rounded-full animate-pulse"
-                    style={{ background: hfColor }}
+                    className="w-2 h-2 rounded-full animate-pulse"
+                    style={{ background: hfColor, boxShadow: `0 0 8px ${hfColor}` }}
                   />
-                  <span className="font-mono text-label-sm text-aegis-dim tracking-widest uppercase">
-                    Position Monitor
+                  <span className="font-mono text-[10px] text-aegis-white font-semibold tracking-widest uppercase">
+                    POSITION TELEMETRY
                   </span>
                 </div>
                 <span
-                  className="font-mono text-label-xs tracking-widest uppercase"
-                  style={{ color: hfColor, transition: 'color 1s ease' }}
+                  className="font-mono text-[10px] font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-full border"
+                  style={{
+                    color: hfColor,
+                    borderColor: `${hfColor}40`,
+                    background: `${hfColor}15`,
+                    transition: 'all 1s ease',
+                  }}
                 >
                   {hfLabel}
                 </span>

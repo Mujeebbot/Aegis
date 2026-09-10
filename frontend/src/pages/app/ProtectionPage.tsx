@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { TechnicalPanel, DataRow } from '../../components/ui/TechnicalPanel'
 import { Button } from '../../components/ui/Button'
@@ -17,12 +18,26 @@ import type { ProtectionWizardState } from '../../types/protection'
 type WizardStep = 1 | 2 | 3 | 4 | 5
 
 export function ProtectionPage() {
-  const [wizard, setWizard] = React.useState<ProtectionWizardState>({
-    step: 1,
-    selectedMode: null,
-    threshold: 1.20,
-    permissionScope: 'LIMITED',
-    positionId: null,
+  const [searchParams] = useSearchParams()
+  const initialMode = searchParams.get('mode') as ProtectionMode | null
+  const initialPos = searchParams.get('pos')
+
+  const [wizard, setWizard] = React.useState<ProtectionWizardState>(() => {
+    let step: WizardStep = 1
+    if (initialPos && initialMode) {
+      step = 3
+    } else if (initialPos) {
+      step = 2
+    } else if (initialMode) {
+      step = 1
+    }
+    return {
+      step,
+      selectedMode: initialMode || null,
+      threshold: 1.20,
+      permissionScope: 'LIMITED',
+      positionId: initialPos || null,
+    }
   })
   const [submitted, setSubmitted] = React.useState(false)
 
