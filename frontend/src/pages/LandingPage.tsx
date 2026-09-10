@@ -11,6 +11,7 @@ import { AttestcoinSection } from '../components/landing/AttestcoinSection'
 import { NonCustodialSection } from '../components/landing/NonCustodialSection'
 import { TechnologySection } from '../components/landing/TechnologySection'
 import { CTASection, Footer } from '../components/landing/CTASection'
+import { AmbientBackground } from '../components/background/AmbientBackground'
 
 // ─── LandingPage ──────────────────────────────────────────────────────────────
 // The full marketing/information website for Aegis.
@@ -19,7 +20,10 @@ import { CTASection, Footer } from '../components/landing/CTASection'
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-aegis-bg-deep text-white selection:bg-aegis-lime selection:text-black">
+    <div className="relative min-h-screen bg-aegis-bg-deep text-white selection:bg-aegis-lime selection:text-black overflow-x-hidden">
+      {/* Continuous Animated 60fps Telemetry Background */}
+      <AmbientBackground fixed={true} intensity="medium" />
+
       {/* Floating Luxury Glass Pill Navigation */}
       <Navigation />
 
