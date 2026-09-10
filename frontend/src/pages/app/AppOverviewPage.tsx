@@ -31,6 +31,7 @@ export function AppOverviewPage() {
             <h1 className="font-display text-2xl font-bold text-white tracking-tight">
               Terminal Overview
             </h1>
+            <StatusBadge state={isConnected ? 'LIVE TESTNET' : 'DEMO MODE'} size="sm" />
             <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-aegis-lime/10 border border-aegis-lime/30 text-aegis-lime font-bold">
               CC3 TESTNET READY
             </span>

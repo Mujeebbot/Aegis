@@ -190,15 +190,18 @@ function SidebarContent({
           </p>
         </div>
 
-        {/* Network status */}
+        {/* Network & Mode status */}
         <div className="p-2.5 rounded-xl bg-[#08130b] border border-white/[0.06] flex items-center justify-between">
-          <span className="text-[10px] font-mono tracking-widest text-aegis-muted uppercase">
-            NETWORK
-          </span>
-          <span className="font-mono text-xs text-emerald-400 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            {networkName ?? 'CC3 Testnet (102031)'}
-          </span>
+          <div>
+            <span className="text-[10px] font-mono tracking-widest text-aegis-muted uppercase block">
+              NETWORK
+            </span>
+            <span className="font-mono text-xs text-emerald-400 flex items-center gap-1.5 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              {networkName ?? 'CC3 Testnet'}
+            </span>
+          </div>
+          <StatusBadge state={isConnected ? 'LIVE TESTNET' : 'DEMO MODE'} size="sm" />
         </div>
       </div>
     </div>

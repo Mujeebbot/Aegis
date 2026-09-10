@@ -5,13 +5,23 @@ import type { RiskState } from '../../types/position'
 // ─── StatusBadge ─────────────────────────────────────────────────────────────
 
 interface StatusBadgeProps {
-  state: RiskState | 'PROTECTED' | 'MONITORING' | 'DEMO' | 'TESTNET' | 'OFFLINE'
+  state: RiskState | 'PROTECTED' | 'MONITORING' | 'DEMO' | 'TESTNET' | 'OFFLINE' | 'LIVE TESTNET' | 'DEMO MODE'
   size?: 'sm' | 'md'
   pulse?: boolean
   className?: string
 }
 
 const STATE_CONFIG: Record<string, { label: string; classes: string; dotClasses: string }> = {
+  'LIVE TESTNET': {
+    label: 'LIVE TESTNET',
+    classes: 'text-aegis-lime bg-aegis-lime/10 border-aegis-lime/40 shadow-[0_0_10px_rgba(168,224,99,0.15)]',
+    dotClasses: 'bg-aegis-lime',
+  },
+  'DEMO MODE': {
+    label: 'DEMO MODE',
+    classes: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
+    dotClasses: 'bg-amber-400',
+  },
   SAFE: {
     label: 'Safe',
     classes: 'text-aegis-lime bg-aegis-lime/10 border-aegis-lime/30',

@@ -64,6 +64,7 @@ export function PositionDetailPage() {
                 <h1 className="font-display text-2xl font-bold text-white">
                   {getProtocolLabel(pos.protocol)}
                 </h1>
+                <StatusBadge state="DEMO MODE" size="sm" />
                 <StatusBadge state={pos.riskState} size="sm" />
               </div>
               <p className="font-mono text-xs text-aegis-muted">

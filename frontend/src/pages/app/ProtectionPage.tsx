@@ -1,13 +1,16 @@
 import React from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { parseUnits } from 'viem'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { TechnicalPanel, DataRow } from '../../components/ui/TechnicalPanel'
 import { Button } from '../../components/ui/Button'
 import { SectionLabel } from '../../components/ui/SectionLabel'
 import { DEMO_POSITIONS } from '../../data/demo'
-import { getProtocolLabel } from '../../lib/utils'
+import { getProtocolLabel, truncateHash } from '../../lib/utils'
 import { getProtectionLabel } from '../../types/position'
 import { PROTECTION_MODE_DESCRIPTIONS } from '../../types/protection'
+import { SETTLEMENT_ADDRESS, SETTLEMENT_ABI } from '../../contracts'
 import type { ProtectionMode } from '../../types/position'
 import type { ProtectionWizardState } from '../../types/protection'
 
@@ -17,10 +20,25 @@ import type { ProtectionWizardState } from '../../types/protection'
 
 type WizardStep = 1 | 2 | 3 | 4 | 5
 
+function getModeEnumIndex(mode: ProtectionMode | null): number {
+  switch (mode) {
+    case 'STOP_LOSS': return 1
+    case 'TAKE_PROFIT': return 2
+    case 'LEVERAGE_REBALANCE': return 3
+    default: return 0
+  }
+}
+
 export function ProtectionPage() {
   const [searchParams] = useSearchParams()
   const initialMode = searchParams.get('mode') as ProtectionMode | null
   const initialPos = searchParams.get('pos')
+
+  const { address, isConnected } = useAccount()
+  const { data: hash, isPending: isWriting, error: writeError, writeContract, reset: resetWrite } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess: isConfirmed, error: receiptError } = useWaitForTransactionReceipt({
+    hash,
+  })
 
   const [wizard, setWizard] = React.useState<ProtectionWizardState>(() => {
     let step: WizardStep = 1
@@ -39,31 +57,62 @@ export function ProtectionPage() {
       positionId: initialPos || null,
     }
   })
-  const [submitted, setSubmitted] = React.useState(false)
 
   const handleSubmit = () => {
-    // Demo — just show success
-    setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setWizard({ step: 1, selectedMode: null, threshold: 1.20, permissionScope: 'LIMITED', positionId: null })
-    }, 3000)
+    if (!address || !wizard.selectedMode) return
+    const modeIndex = getModeEnumIndex(wizard.selectedMode)
+    const thresholdScaled = parseUnits(wizard.threshold.toFixed(2), 18)
+
+    writeContract({
+      address: SETTLEMENT_ADDRESS,
+      abi: SETTLEMENT_ABI,
+      functionName: 'setProtectionMode',
+      args: [address, modeIndex, thresholdScaled],
+    })
   }
 
-  if (submitted) {
+  const handleReset = () => {
+    resetWrite()
+    setWizard({ step: 1, selectedMode: null, threshold: 1.20, permissionScope: 'LIMITED', positionId: null })
+  }
+
+  if (isConfirmed) {
     return (
       <div className="p-5 md:p-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh]">
-        <div className="text-center">
+        <div className="text-center w-full">
           <div
             className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
             style={{ background: 'rgba(168,224,99,0.1)', border: '1px solid rgba(168,224,99,0.3)', boxShadow: '0 0 40px rgba(168,224,99,0.2)' }}
           >
-            <span className="text-2xl">✓</span>
+            <span className="text-2xl text-aegis-lime">✓</span>
           </div>
-          <h2 className="font-display text-2xl font-bold text-aegis-lime mb-3">Protection Configured</h2>
-          <p className="text-aegis-dim font-mono text-sm">
-            Demo mode — protection configuration logged. In production, this would submit to the Settlement Contract on CC3.
+          <h2 className="font-display text-2xl font-bold text-aegis-lime mb-2">Protection Configured on CC3</h2>
+          <p className="text-aegis-dim font-mono text-sm mb-6">
+            Transaction confirmed! Settlement Contract `setProtectionMode` updated.
           </p>
+
+          <TechnicalPanel className="mb-6 p-4 text-left font-mono text-xs space-y-2">
+            <div className="flex justify-between">
+              <span className="text-aegis-dim">Contract</span>
+              <span className="text-aegis-lime">{truncateHash(SETTLEMENT_ADDRESS)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-aegis-dim">Transaction Hash</span>
+              <span className="text-white font-bold">{hash ? truncateHash(hash) : 'Confirmed'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-aegis-dim">Mode</span>
+              <span className="text-white">{wizard.selectedMode}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-aegis-dim">Threshold</span>
+              <span className="text-aegis-lime font-bold">HF {wizard.threshold.toFixed(2)}</span>
+            </div>
+          </TechnicalPanel>
+
+          <Button variant="primary" size="md" onClick={handleReset}>
+            Configure Another Position
+          </Button>
         </div>
       </div>
     )
@@ -75,9 +124,9 @@ export function ProtectionPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-1.5">
           <h1 className="font-display text-2xl font-bold text-aegis-white">Set Protection</h1>
-          <StatusBadge state="DEMO" size="sm" />
+          <StatusBadge state={isConnected ? 'LIVE TESTNET' : 'DEMO MODE'} size="sm" />
         </div>
-        <p className="text-sm text-aegis-dim font-mono">Configure automated defense for your positions</p>
+        <p className="text-sm text-aegis-dim font-mono">Configure automated defense on CC3 Settlement Contract</p>
       </div>
 
       {/* Step progress */}
@@ -109,7 +158,19 @@ export function ProtectionPage() {
       {wizard.step === 2 && <StepSelectMode wizard={wizard} setWizard={setWizard} />}
       {wizard.step === 3 && <StepSetThreshold wizard={wizard} setWizard={setWizard} />}
       {wizard.step === 4 && <StepPermissions wizard={wizard} setWizard={setWizard} />}
-      {wizard.step === 5 && <StepReview wizard={wizard} setWizard={setWizard} onSubmit={handleSubmit} />}
+      {wizard.step === 5 && (
+        <StepReview
+          wizard={wizard}
+          setWizard={setWizard}
+          onSubmit={handleSubmit}
+          isConnected={isConnected}
+          userAddress={address}
+          isWriting={isWriting}
+          isConfirming={isConfirming}
+          hash={hash}
+          error={writeError || receiptError}
+        />
+      )}
     </div>
   )
 }
@@ -337,48 +398,103 @@ function StepPermissions({ wizard, setWizard }: WizardProps) {
   )
 }
 
-// ─── Step 5: Review + Submit ──────────────────────────────────────────────────
+interface StepReviewProps extends WizardProps {
+  onSubmit: () => void
+  isConnected?: boolean
+  userAddress?: string
+  isWriting?: boolean
+  isConfirming?: boolean
+  hash?: `0x${string}`
+  error?: Error | null
+}
 
-function StepReview({ wizard, setWizard, onSubmit }: WizardProps & { onSubmit: () => void }) {
+function StepReview({
+  wizard,
+  setWizard,
+  onSubmit,
+  isConnected,
+  userAddress,
+  isWriting,
+  isConfirming,
+  hash,
+  error,
+}: StepReviewProps) {
   const pos = DEMO_POSITIONS.find(p => p.id === wizard.positionId)
   const modeInfo = wizard.selectedMode ? PROTECTION_MODE_DESCRIPTIONS[wizard.selectedMode] : null
 
   return (
     <div>
-      <SectionLabel className="mb-5">Step 05 — Review Configuration</SectionLabel>
+      <SectionLabel className="mb-5">Step 05 — Review & Submit</SectionLabel>
       <h2 className="font-display text-xl font-bold text-aegis-white mb-6">
         Confirm your protection setup.
       </h2>
 
       <TechnicalPanel className="mb-6">
         <div className="p-4">
-          <DataRow label="Position"   value={pos ? getProtocolLabel(pos.protocol) : '—'} />
-          <DataRow label="Chain"      value={pos?.chainName ?? '—'} />
-          <DataRow label="Mode"       value={modeInfo?.title ?? '—'} />
-          <DataRow label="Threshold"  value={<span className="text-aegis-lime font-bold">HF {wizard.threshold.toFixed(2)}</span>} />
-          <DataRow label="Permission" value={wizard.permissionScope} />
-          <DataRow label="Network"    value="Creditcoin CC3 Testnet" />
+          <DataRow label="Target Position" value={pos ? getProtocolLabel(pos.protocol) : '—'} />
+          <DataRow label="Target Chain"    value={pos?.chainName ?? '—'} />
+          <DataRow label="Defense Mode"    value={modeInfo?.title ?? '—'} />
+          <DataRow label="Risk Threshold"  value={<span className="text-aegis-lime font-bold">HF {wizard.threshold.toFixed(2)}</span>} />
+          <DataRow label="Permission"      value={wizard.permissionScope} />
+          <DataRow label="Settlement Engine" value="Creditcoin CC3 Testnet" />
+          <DataRow label="Settlement Address" value={<span className="font-mono text-xs text-aegis-lime">{truncateHash(SETTLEMENT_ADDRESS)}</span>} />
+          <DataRow label="User Wallet"     value={<span className="font-mono text-xs text-white">{userAddress ? truncateHash(userAddress) : 'Not Connected'}</span>} />
         </div>
       </TechnicalPanel>
 
-      <div className="px-4 py-3 rounded-sm mb-6" style={{ background: 'rgba(232,160,64,0.06)', border: '1px solid rgba(232,160,64,0.15)' }}>
-        <p className="text-xs text-aegis-dim font-mono">
-          Demo mode: This configuration will be logged but not submitted to the Settlement Contract.
-          In production, this would call{' '}
-          <span className="text-aegis-cyan">setProtectionMode(...)</span>{' '}
-          on the CC3 Settlement Contract.
-        </p>
-      </div>
+      {/* Contract Transaction Status Banner */}
+      {isConnected ? (
+        <div className="px-4 py-3 rounded-xl mb-6 bg-aegis-lime/5 border border-aegis-lime/30 text-xs font-mono">
+          <div className="flex items-center gap-2 text-aegis-lime font-bold mb-1">
+            <span className="w-2 h-2 rounded-full bg-aegis-lime animate-pulse" />
+            <span>LIVE CC3 TESTNET TRANSACTION</span>
+          </div>
+          <p className="text-aegis-dim">
+            Clicking Activate Protection will invoke <span className="text-aegis-lime font-semibold">setProtectionMode(user, mode, threshold)</span> directly on the Settlement Contract.
+          </p>
+        </div>
+      ) : (
+        <div className="px-4 py-3 rounded-xl mb-6 bg-amber-400/10 border border-amber-400/30 text-xs font-mono text-amber-300">
+          ⚠️ Wallet Not Connected — Please connect your wallet in the top right / sidebar to send on-chain transactions.
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="px-4 py-3 rounded-xl mb-6 bg-aegis-red/10 border border-aegis-red/30 text-xs font-mono text-aegis-red">
+          <div className="font-bold mb-1">Transaction Failed</div>
+          <p className="break-words">{error.message || 'Transaction rejected or reverted.'}</p>
+        </div>
+      )}
+
+      {/* Loading Banner */}
+      {(isWriting || isConfirming) && (
+        <div className="px-4 py-4 rounded-xl mb-6 bg-[#081b10] border border-aegis-lime/40 text-xs font-mono text-aegis-lime flex items-center gap-3">
+          <div className="w-5 h-5 border-2 border-aegis-lime border-t-transparent rounded-full animate-spin shrink-0" />
+          <div>
+            <div className="font-bold">
+              {isWriting ? 'Requesting Wallet Signature...' : 'Confirming Transaction on CC3 Testnet...'}
+            </div>
+            {hash && (
+              <div className="text-[11px] text-aegis-dim mt-0.5">
+                Tx: {truncateHash(hash)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-3">
-        <Button variant="ghost" size="md" onClick={() => setWizard(w => ({ ...w, step: 4 }))}>← Back</Button>
+        <Button variant="ghost" size="md" onClick={() => setWizard(w => ({ ...w, step: 4 }))} disabled={isWriting || isConfirming}>
+          ← Back
+        </Button>
         <Button
           variant="primary"
           size="lg"
           onClick={onSubmit}
-          disabled={!wizard.positionId || !wizard.selectedMode}
+          disabled={!isConnected || !wizard.positionId || !wizard.selectedMode || isWriting || isConfirming}
         >
-          Activate Protection
+          {isWriting ? 'Signing Tx...' : isConfirming ? 'Confirming Tx...' : 'Activate Protection'}
         </Button>
       </div>
     </div>

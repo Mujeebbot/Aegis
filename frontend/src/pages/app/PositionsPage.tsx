@@ -28,6 +28,7 @@ export function PositionsPage() {
             <h1 className="font-display text-2xl font-bold text-white tracking-tight">
               Monitored Positions
             </h1>
+            <StatusBadge state="DEMO MODE" size="sm" />
             <span className="font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-aegis-lime/10 border border-aegis-lime/30 text-aegis-lime font-bold">
               3 PROTOCOLS ACTIVE
             </span>
@@ -35,6 +36,15 @@ export function PositionsPage() {
           <p className="text-xs text-aegis-muted font-mono">
             Cross-chain lending telemetry via The Graph • Aave V3, Compound V3, Morpho Blue
           </p>
+        </div>
+      </div>
+
+      {/* Contract Getter Blocker Notice */}
+      <div className="p-3.5 rounded-xl bg-amber-500/5 border border-amber-500/20 font-mono text-xs text-amber-300/90 flex items-start gap-3">
+        <span className="text-amber-400 font-bold shrink-0">ℹ️ DEMO MODE NOTICE:</span>
+        <div>
+          Pending contract getter on Settlement contract (`getUserConfig(address user) view returns (ProtectionMode, uint256 threshold, bool configured)`).
+          Displaying demo position state until Abraham adds the getter to the Solidity contract.
         </div>
       </div>
 
